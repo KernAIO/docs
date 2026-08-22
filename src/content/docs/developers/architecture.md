@@ -31,7 +31,7 @@ Moving a module from one service to another is configuration: the kernel routes 
 
 ## Kernel
 
-`@kernaio/kernel` is the runtime every backend service embeds:
+`@kernhq/kernel` is the runtime every backend service embeds:
 
 - `defineModule()` / `defineServerModule()` — a module's manifest and server extension points.
 - **Module registry** — dependency-sorted, exposes permissions, notification types, manifests.
@@ -46,11 +46,11 @@ Moving a module from one service to another is configuration: the kernel routes 
 
 ## Contracts
 
-`@kernaio/contracts` is the only thing two modules or services share: Zod schemas, oRPC contracts, event definitions, permission keys, error codes, the realtime protocol. Changing a contract first, publishing, then updating consumers is the rule for cross-repo changes.
+`@kernhq/contracts` is the only thing two modules or services share: Zod schemas, oRPC contracts, event definitions, permission keys, error codes, the realtime protocol. Changing a contract first, publishing, then updating consumers is the rule for cross-repo changes.
 
 ## Modules
 
-`@kernaio/module-<id>` packages export `/contract`, `/server` (routes, Drizzle schema in `mod_<id>`, migrations, event subscriptions, jobs, procedures, permissions, automations, search indexers, object resolvers) and `/client` (routes, navigation, presenters, slots, settings pages, i18n). The app and each service list the modules they host in a static registry — tree-shaken, typed, no runtime plugin loading.
+`@kernhq/module-<id>` packages export `/contract`, `/server` (routes, Drizzle schema in `mod_<id>`, migrations, event subscriptions, jobs, procedures, permissions, automations, search indexers, object resolvers) and `/client` (routes, navigation, presenters, slots, settings pages, i18n). The app and each service list the modules they host in a static registry — tree-shaken, typed, no runtime plugin loading.
 
 ## Data and tenancy
 

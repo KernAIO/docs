@@ -21,9 +21,9 @@ pnpm db:migrate   # run every hosted module's migrations
 pnpm dev          # turbo runs everything with hot reload
 ```
 
-`pnpm-workspace.yaml` lists `repos/*` and `repos/*/packages/*`, so every `@kernaio/*` dependency resolves to the local source — change `kernel` and the services pick it up immediately.
+`pnpm-workspace.yaml` lists `repos/*` and `repos/*/packages/*`, so every `@kernhq/*` dependency resolves to the local source — change `kernel` and the services pick it up immediately.
 
-Each repo also works standalone (`pnpm i && pnpm dev`) against the published `@kernaio/*` packages; that is how CI builds them.
+Each repo also works standalone (`pnpm i && pnpm dev`) against the published `@kernhq/*` packages; that is how CI builds them.
 
 ## Ports
 

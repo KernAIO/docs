@@ -13,15 +13,15 @@ Kern lives in the GitHub organisation [`KernAIO`](https://github.com/KernAIO). A
 | [`chat`](https://github.com/KernAIO/chat) | chat module + realtime WebSocket gateway |
 | [`mail`](https://github.com/KernAIO/mail) | outbound providers, IMAP/SMTP inbox, inbound intake |
 | [`collab`](https://github.com/KernAIO/collab) | Yjs/Hocuspocus collaborative editing server |
-| [`kernel`](https://github.com/KernAIO/kernel) | `@kernaio/kernel`, `@kernaio/contracts`, `@kernaio/ui`, `@kernaio/sdk`, `@kernaio/testing` |
-| [`modules`](https://github.com/KernAIO/modules) | first-party modules monorepo (`@kernaio/module-*`) |
+| [`kernel`](https://github.com/KernAIO/kernel) | `@kernhq/kernel`, `@kernhq/contracts`, `@kernhq/ui`, `@kernhq/sdk`, `@kernhq/testing` |
+| [`modules`](https://github.com/KernAIO/modules) | first-party modules monorepo (`@kernhq/module-*`) |
 | [`docs`](https://github.com/KernAIO/docs) | this documentation site |
 
 A private `cloud` repository (billing, SaaS control plane) is out of scope for v1.
 
 ## Packages
 
-Shared packages are published to GitHub Packages under the `@kernaio` scope on every merge to `main` of `kernel` and `modules` (Changesets prereleases); Renovate keeps the service repos bumped. Inside the umbrella workspace they are linked locally so you never wait for a publish while developing.
+Shared packages are published to GitHub Packages under the `@kernhq` scope on every merge to `main` of `kernel` and `modules` (Changesets prereleases); Renovate keeps the service repos bumped. Inside the umbrella workspace they are linked locally so you never wait for a publish while developing.
 
 ## Images
 

@@ -21,7 +21,7 @@ Reachable from the user menu (**Instance admin**) or at `/admin`. It covers:
 
 ## Instance settings schema
 
-Instance settings are a small typed document (`InstanceSettings` in `@kernaio/contracts`):
+Instance settings are a small typed document (`InstanceSettings` in `@kernhq/contracts`):
 
 | Field | Default | Meaning |
 |---|---|---|

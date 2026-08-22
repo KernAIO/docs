@@ -1,5 +1,5 @@
 {
-  "name": "@kernaio/docs",
+  "name": "@kernhq/docs",
   "version": "0.1.0",
   "private": true,
   "description": "Kern documentation site (Astro Starlight)",
