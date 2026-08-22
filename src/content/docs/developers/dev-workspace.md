@@ -13,7 +13,7 @@ Kern is many repositories, but day to day it feels like one monorepo thanks to t
 ## Setup
 
 ```bash
-git clone https://github.com/KernALO/kern && cd kern
+git clone https://github.com/KernAIO/kern && cd kern
 pnpm setup        # clones app core chat mail collab kernel modules docs into ./repos and installs deps
 pnpm infra        # Postgres 18 (pgvector) · NATS · Valkey · MinIO · Mailpit  — docker compose -f dev/compose.yml up -d
 cp dev/.env.example .env   # (setup does this) shared dev environment
@@ -21,9 +21,9 @@ pnpm db:migrate   # run every hosted module's migrations
 pnpm dev          # turbo runs everything with hot reload
 ```
 
-`pnpm-workspace.yaml` lists `repos/*` and `repos/*/packages/*`, so every `@kernalo/*` dependency resolves to the local source — change `kernel` and the services pick it up immediately.
+`pnpm-workspace.yaml` lists `repos/*` and `repos/*/packages/*`, so every `@kernaio/*` dependency resolves to the local source — change `kernel` and the services pick it up immediately.
 
-Each repo also works standalone (`pnpm i && pnpm dev`) against the published `@kernalo/*` packages; that is how CI builds them.
+Each repo also works standalone (`pnpm i && pnpm dev`) against the published `@kernaio/*` packages; that is how CI builds them.
 
 ## Ports
 

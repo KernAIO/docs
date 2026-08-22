@@ -5,13 +5,13 @@ import { defineConfig } from 'astro/config'
 const base = process.env.DOCS_BASE ?? '/'
 
 export default defineConfig({
-  site: 'https://kernalo.github.io',
+  site: 'https://kernaio.github.io',
   base,
   integrations: [
     starlight({
       title: 'Kern Docs',
       description: 'Documentation for Kern — the open-source all-in-one work platform.',
-      social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/KernALO' }],
+      social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/KernAIO' }],
       customCss: ['./src/styles/kern.css'],
       head: [
         { tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.googleapis.com' } },
@@ -24,7 +24,7 @@ export default defineConfig({
           },
         },
       ],
-      editLink: { baseUrl: 'https://github.com/KernALO/docs/edit/main/' },
+      editLink: { baseUrl: 'https://github.com/KernAIO/docs/edit/main/' },
       lastUpdated: false,
       sidebar: [
         {

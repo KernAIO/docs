@@ -7,7 +7,7 @@ Every module's router is mounted by the hosting service under **`/api/<module>`*
 
 | URL | What |
 |---|---|
-| `/api/<module>/rpc/*` | **oRPC** protocol — used by the SvelteKit app through `@kernalo/sdk` (typed client, batching, streaming) |
+| `/api/<module>/rpc/*` | **oRPC** protocol — used by the SvelteKit app through `@kernaio/sdk` (typed client, batching, streaming) |
 | `/api/<module>/<path>` | **REST / OpenAPI-style** routes from the contract's `route({ method, path })` — for curl, scripts, third parties, webhooks |
 | `/api/<module>/openapi.json` | OpenAPI **3.1** document for that module (Zod schemas converted to JSON Schema) |
 
@@ -65,4 +65,4 @@ Outgoing webhooks (configured per workspace) are signed with an HMAC header; inc
 
 ## Generating clients
 
-Point any OpenAPI 3.1 generator at `/api/<module>/openapi.json`, or use `@kernalo/sdk` from TypeScript for end-to-end types.
+Point any OpenAPI 3.1 generator at `/api/<module>/openapi.json`, or use `@kernaio/sdk` from TypeScript for end-to-end types.

@@ -3,15 +3,15 @@ title: Module development
 description: Build a Kern module — package shape, contract, server, schema, migrations, client — by walking through the template module.
 ---
 
-Every feature in Kern is a module, and first-party modules use exactly the same shape you would. The quickest start is to copy `packages/_template` in the [`modules`](https://github.com/KernALO/modules) repository. This page walks through it file by file.
+Every feature in Kern is a module, and first-party modules use exactly the same shape you would. The quickest start is to copy `packages/_template` in the [`modules`](https://github.com/KernAIO/modules) repository. This page walks through it file by file.
 
 ## Package shape
 
-A module is an npm package named `@kernalo/module-<id>` that exports three entry points (plus its SQL migrations):
+A module is an npm package named `@kernaio/module-<id>` that exports three entry points (plus its SQL migrations):
 
 ```json title="package.json"
 {
-  "name": "@kernalo/module-template",
+  "name": "@kernaio/module-template",
   "type": "module",
   "files": ["dist", "migrations"],
   "exports": {
@@ -26,7 +26,7 @@ A module is an npm package named `@kernalo/module-<id>` that exports three entry
     "test": "vitest run",
     "db:generate": "drizzle-kit generate"
   },
-  "dependencies": { "@kernalo/contracts": "^0.1.0", "@kernalo/kernel": "^0.1.0", "@orpc/contract": "^1.15.0", "@orpc/server": "^1.15.0", "drizzle-orm": "^0.45.0", "zod": "^4.1.0" }
+  "dependencies": { "@kernaio/contracts": "^0.1.0", "@kernaio/kernel": "^0.1.0", "@orpc/contract": "^1.15.0", "@orpc/server": "^1.15.0", "drizzle-orm": "^0.45.0", "zod": "^4.1.0" }
 }
 ```
 
@@ -37,7 +37,7 @@ A module is an npm package named `@kernalo/module-<id>` that exports three entry
 ## 1. Contract
 
 ```ts title="src/contract.ts"
-import { baseContract, PageInput, WorkspaceId, page, defineEvent, definePermissions } from '@kernalo/contracts'
+import { baseContract, PageInput, WorkspaceId, page, defineEvent, definePermissions } from '@kernaio/contracts'
 import { z } from 'zod'
 
 export const MODULE_ID = 'template'
@@ -113,7 +113,7 @@ The definition can also declare `dependsOn`, `defaultHost` (`core` by default), 
 ## 3. Schema and migrations
 
 ```ts title="src/server/schema.ts"
-import { moduleSchema } from '@kernalo/kernel'
+import { moduleSchema } from '@kernaio/kernel'
 import { index, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 
@@ -137,7 +137,7 @@ Rules:
 - Add **row-level security** to generated migrations with the helper:
 
 ```ts
-import { rlsPolicySql } from '@kernalo/kernel'
+import { rlsPolicySql } from '@kernaio/kernel'
 // emits: enable/force RLS + policy using current_setting('app.workspace_id')
 rlsPolicySql('mod_template', 'widgets')
 ```
@@ -149,13 +149,13 @@ Generate migrations with `pnpm db:generate` (`drizzle.config.ts` filters to `mod
 ## 4. Router implementation
 
 ```ts title="src/server/_impl.ts"
-import { type Kernel, defineModule, defineServerModule, workspaceScoped, requires, uuidv7 } from '@kernalo/kernel'
+import { type Kernel, defineModule, defineServerModule, workspaceScoped, requires, uuidv7 } from '@kernaio/kernel'
 import { implement } from '@orpc/server'
 import { desc, eq } from 'drizzle-orm'
 import { MODULE_ID, templateContract, templateEvents } from '../contract.js'
 import { widgets } from './schema.js'
 
-const os = implement(templateContract).$context<import('@kernalo/kernel').RequestContext>()
+const os = implement(templateContract).$context<import('@kernaio/kernel').RequestContext>()
 
 export function implement_(kernel: Kernel) {
   const scoped = os.use(workspaceScoped(MODULE_ID))      // membership + "module enabled" check
@@ -181,14 +181,14 @@ export function implement_(kernel: Kernel) {
 }
 ```
 
-Middleware from `@kernalo/kernel`: `authed` (any authenticated principal), `workspaceScoped(moduleId)` (active membership + module enabled → sets `context.workspaceId`), `requires(permission)` (workspace-scope permission). For object/project scope call `kernel.authz.require(principal, key, { kind: 'project', id, workspaceId, parents })` directly.
+Middleware from `@kernaio/kernel`: `authed` (any authenticated principal), `workspaceScoped(moduleId)` (active membership + module enabled → sets `context.workspaceId`), `requires(permission)` (workspace-scope permission). For object/project scope call `kernel.authz.require(principal, key, { kind: 'project', id, workspaceId, parents })` directly.
 
 After a mutation: **emit an event** (activity, automation, webhooks, other modules) and **publish a realtime change** (clients invalidate their caches).
 
 ## 5. Client module
 
 ```ts title="src/client/index.ts"
-import { defineClientModule } from '@kernalo/kernel/client'
+import { defineClientModule } from '@kernaio/kernel/client'
 export const templateClient = defineClientModule({
   id: 'template',
   name: 'Template',
@@ -206,4 +206,4 @@ Add the package to the host service's static registry (e.g. `core`'s `kern.modul
 
 ## Testing
 
-Unit-test contract logic with Vitest. For integration, boot `createKernel({ service: 'test', modules: [templateModule] })` against the dev Postgres; stub core procedures by registering them locally: `kernel.broker.register('core', { 'users.principal': { handler: async () => testPrincipal() } })`. `@kernalo/kernel/testing` exports `InMemoryEventBus` and `testPrincipal()`.
+Unit-test contract logic with Vitest. For integration, boot `createKernel({ service: 'test', modules: [templateModule] })` against the dev Postgres; stub core procedures by registering them locally: `kernel.broker.register('core', { 'users.principal': { handler: async () => testPrincipal() } })`. `@kernaio/kernel/testing` exports `InMemoryEventBus` and `testPrincipal()`.

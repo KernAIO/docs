@@ -1,6 +1,6 @@
 # Kern Docs
 
-Documentation site for [Kern](https://github.com/KernALO/kern) — built with [Astro Starlight](https://starlight.astro.build).
+Documentation site for [Kern](https://github.com/KernAIO/kern) — built with [Astro Starlight](https://starlight.astro.build).
 
 ## Develop
 

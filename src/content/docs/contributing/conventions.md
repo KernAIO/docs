@@ -7,7 +7,7 @@ description: Commit messages, code style, testing and release conventions across
 
 - **Conventional Commits**: `feat(tracker): add cycle carry-over`, `fix(chat): unread counter drift`, `docs:`, `chore:`, `refactor:`, `test:`, `ci:`. Scope = module or area. Breaking changes use `!` and a `BREAKING CHANGE:` footer.
 - Small, focused PRs; CI must be green (`lint`, `typecheck`, `test`, `build`).
-- Contract changes first: change `@kernalo/contracts` (or a module's `/contract`), publish, then update consumers.
+- Contract changes first: change `@kernaio/contracts` (or a module's `/contract`), publish, then update consumers.
 
 ## Code style
 
@@ -25,7 +25,7 @@ description: Commit messages, code style, testing and release conventions across
 
 ## Releases
 
-- `kernel` and `modules` publish `@kernalo/*` with **Changesets** (prereleases on every merge to `main`). Add a changeset to any PR that changes a published package.
+- `kernel` and `modules` publish `@kernaio/*` with **Changesets** (prereleases on every merge to `main`). Add a changeset to any PR that changes a published package.
 - Services build Docker images on `main` and on `v*` tags; the `kern` repo pins a tested set per release.
 - Renovate keeps dependencies current; review its PRs like any other.
 

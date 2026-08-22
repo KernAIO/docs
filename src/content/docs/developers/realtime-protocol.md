@@ -3,7 +3,7 @@ title: Realtime protocol
 description: The WebSocket protocol between clients and the chat service's realtime gateway.
 ---
 
-Clients keep **one WebSocket** to the chat service (`/ws`) for all workspaces. Messages are JSON, validated with Zod schemas from `@kernalo/contracts` (`ClientMessage`, `ServerMessage`).
+Clients keep **one WebSocket** to the chat service (`/ws`) for all workspaces. Messages are JSON, validated with Zod schemas from `@kernaio/contracts` (`ClientMessage`, `ServerMessage`).
 
 ## Client → server
 

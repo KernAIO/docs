@@ -15,7 +15,7 @@ Kern ships as a set of Docker images plus a `docker compose` file, a Caddy rever
 ## One-line install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/KernALO/kern/main/selfhost/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/KernAIO/kern/main/selfhost/install.sh | bash
 ```
 
 The script is short and readable; you are encouraged to inspect it first. It does the following:
@@ -38,7 +38,7 @@ If you prefer not to pipe a script into bash:
 
 ```bash
 mkdir -p ~/kern/postgres-init && cd ~/kern
-RAW=https://raw.githubusercontent.com/KernALO/kern/main/selfhost
+RAW=https://raw.githubusercontent.com/KernAIO/kern/main/selfhost
 for f in docker-compose.yml Caddyfile livekit.yaml .env.example postgres-init/01-extensions.sql; do
   curl -fsSL "$RAW/$f" -o "$f"
 done
@@ -54,12 +54,12 @@ See the [Environment reference](/self-hosting/env-reference/) for every variable
 | Service | Image | Role |
 |---|---|---|
 | `caddy` | `caddy:2-alpine` | TLS termination and routing (ports 80/443) |
-| `app` | `ghcr.io/kernalo/app` | SvelteKit PWA (:3000) |
-| `core` | `ghcr.io/kernalo/core` | identity, workspaces, permissions, notifications + most modules (:4000) |
-| `core-worker` | `ghcr.io/kernalo/core` | background jobs (pg-boss) |
-| `chat` | `ghcr.io/kernalo/chat` | chat + realtime WebSocket gateway (:4100) |
-| `mail` | `ghcr.io/kernalo/mail` | outbound providers, IMAP sync, inbound intake (:4200) |
-| `collab` | `ghcr.io/kernalo/collab` | Yjs collaborative editing (:4300) |
+| `app` | `ghcr.io/kernaio/app` | SvelteKit PWA (:3000) |
+| `core` | `ghcr.io/kernaio/core` | identity, workspaces, permissions, notifications + most modules (:4000) |
+| `core-worker` | `ghcr.io/kernaio/core` | background jobs (pg-boss) |
+| `chat` | `ghcr.io/kernaio/chat` | chat + realtime WebSocket gateway (:4100) |
+| `mail` | `ghcr.io/kernaio/mail` | outbound providers, IMAP sync, inbound intake (:4200) |
+| `collab` | `ghcr.io/kernaio/collab` | Yjs collaborative editing (:4300) |
 | `postgres` | `pgvector/pgvector:pg18` | database (pgvector, pg_trgm, ltree) |
 | `nats` | `nats:2.11-alpine` | event bus (JetStream) |
 | `valkey` | `valkey/valkey:8-alpine` | cache, presence, rate limits |
