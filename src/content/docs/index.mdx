@@ -1,0 +1,41 @@
+---
+title: Kern Docs
+description: Kern is the open-source, self-hostable all-in-one work platform — issues, chat, docs, HR, CRM, automation, mail, calls and AI in one app.
+template: splash
+hero:
+  title: One app for how your team works
+  tagline: Kern bundles issue tracking, chat, docs & drive, HR & recruiting, CRM, automation, a mail inbox, calls and an AI assistant into a single self-hostable platform — many workspaces, one login, one notification inbox.
+  actions:
+    - text: Install Kern
+      link: /self-hosting/install/
+      icon: right-arrow
+      variant: primary
+    - text: What is Kern?
+      link: /introduction/what-is-kern/
+      variant: minimal
+    - text: GitHub
+      link: https://github.com/KernALO
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components'
+
+<CardGrid stagger>
+  <Card title="Self-host in minutes" icon="rocket">
+    One `curl | bash`, one domain, one `docker compose up`. Postgres, NATS, Valkey, MinIO and Caddy with automatic HTTPS are bundled. See [Install](/self-hosting/install/).
+  </Card>
+  <Card title="Modular by design" icon="puzzle">
+    Every capability is a module with a contract, a server part and a client part. Enable or disable them per workspace. Read [Modules](/administration/modules/).
+  </Card>
+  <Card title="Many workspaces, one inbox" icon="open-book">
+    Users belong to any number of workspaces and see notifications from all of them in one place. Learn the [core concepts](/introduction/concepts/).
+  </Card>
+  <Card title="Built for developers" icon="setting">
+    Typed contracts (Zod + oRPC), OpenAPI 3.1 for every module, a realtime protocol and a module SDK. Start with the [architecture](/developers/architecture/).
+  </Card>
+</CardGrid>
+
+:::note[Status]
+Kern is pre-release and being built in private. The v1.0 target is Q4 2026. These docs describe the intended v1.0 behaviour; pages are updated as features land.
+:::

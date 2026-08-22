@@ -1,0 +1,28 @@
+{
+  "name": "@kernalo/docs",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Kern documentation site (Astro Starlight)",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "packageManager": "pnpm@10.30.3",
+  "scripts": {
+    "dev": "astro dev --port 4400",
+    "start": "astro preview --port 4400",
+    "build": "astro build",
+    "preview": "astro preview --port 4400",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "typecheck": "astro check",
+    "test": "echo \"no tests\" && exit 0"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.0",
+    "@astrojs/starlight": "^0.41.0",
+    "astro": "^7.2.0",
+    "sharp": "^0.34.0",
+    "typescript": "~5.9.3"
+  },
+  "devDependencies": { "@biomejs/biome": "^2.5.0" }
+}
