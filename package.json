@@ -5,7 +5,9 @@
   "description": "Kern documentation site (Astro Starlight)",
   "license": "AGPL-3.0-only",
   "type": "module",
-  "engines": { "node": ">=24" },
+  "engines": {
+    "node": ">=24"
+  },
   "packageManager": "pnpm@10.30.3",
   "scripts": {
     "dev": "astro dev --port 4400",
@@ -24,5 +26,7 @@
     "sharp": "^0.34.0",
     "typescript": "~5.9.3"
   },
-  "devDependencies": { "@biomejs/biome": "^2.5.0" }
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.0"
+  }
 }
