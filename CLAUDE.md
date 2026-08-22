@@ -28,3 +28,24 @@ The repositories are **public**, so every commit is visible the moment it is pus
 - `pnpm typecheck && pnpm lint && pnpm test && pnpm build` must pass before pushing.
 - UI follows `app/DESIGN.md` (Ink/paper design system) and must work in RTL (fa/ar) and dark mode.
 - All user-facing strings go through i18n (Paraglide) — no hardcoded English in components.
+
+## Keeping this file current
+This file is how the next person — or the next agent — avoids repeating what we already worked out.
+When you learn something durable, add it here **in the same commit as the change that taught you**:
+- a trap that cost you time (a silent failure, a misleading error, a tool that lies about success)
+- a convention you had to infer from reading several files
+- a decision and the reason behind it, especially where the obvious choice is wrong
+Keep it specific and short. Delete anything that stops being true — a stale note is worse than none.
+
+---
+
+# This repository: docs (documentation site)
+
+Astro Starlight, themed with the Kern paper palette. Runs on **:4400**.
+
+**Things worth knowing**
+- Content lives in `src/content/docs/`. The sidebar is configured in `astro.config.mjs`; a new page
+  needs an entry there.
+- Deployment is manual (`workflow_dispatch`) until GitHub Pages is enabled on the repository.
+- Write for someone who has never seen Kern. Anything that assumes context from the other repositories
+  belongs in the Developers section, with a link to the source.
