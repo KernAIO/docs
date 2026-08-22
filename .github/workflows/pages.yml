@@ -1,7 +1,7 @@
 name: GitHub Pages
-# Publishing waits for the repositories to go public at v1.0: GitHub Pages has to be enabled on the
-# repository first, and it cannot serve from a private repository on the free plan. Run it by hand
-# from the Actions tab once Pages is switched on.
+# GitHub Pages has to be switched on for this repository before this can run: Settings → Pages →
+# Source: GitHub Actions. Until then, start it by hand from the Actions tab. Once Pages is on, add
+# `push: { branches: [main] }` here so the site follows `main`.
 on:
   workflow_dispatch:
 permissions: { contents: read, pages: write, id-token: write }
