@@ -69,3 +69,19 @@ Astro Starlight, themed with the Kern paper palette. Runs on **:4400**.
 - Deployment is manual (`workflow_dispatch`) until GitHub Pages is enabled on the repository.
 - Write for someone who has never seen Kern. Anything that assumes context from the other repositories
   belongs in the Developers section, with a link to the source.
+- `src/styles/kern.css` maps Starlight's variables onto the Ink/Paper tokens from `app/DESIGN.md`,
+  in the proportions the marketing site uses. Change a colour there, not here.
+- The fonts are served from `public/fonts` and declared in `src/styles/fonts.css`, copied from the
+  website repository (which generates it with `scripts/fetch-fonts.mjs`). A Google Fonts `<link>`
+  blocks the first paint and hands every reader's IP to Google — do not put one back.
+- The mark in `src/assets/` carries the "K" as an **outline**, not `<text>`. Starlight renders the
+  logo as `<img>`, and an SVG loaded as an image cannot reach a web font, so lettering falls back to
+  whatever the reader has. There is a light pair and a dark pair; the square and the letter swap.
+
+**Two traps, both of which look like a broken theme**
+- Expressive Code parses colour-valued `styleOverrides` at build time and **silently drops anything
+  it cannot read, `var(--x)` included** — the result is code blocks with no background and no syntax
+  colour. Keep colours in `kern.css` and leave only metrics (radius, font, padding) in the config.
+- `astro dev` is daemonised: `pkill` does not stop it, `pnpm exec astro dev stop` does. A build run
+  while it is up can leave `dist/` referencing an `ec.*.css` that was never emitted, which strips
+  every code block of its theme. If code blocks look unstyled, `rm -rf dist .astro` and build again.

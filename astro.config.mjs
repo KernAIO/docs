@@ -11,19 +11,60 @@ export default defineConfig({
     starlight({
       title: 'Kern Docs',
       description: 'Documentation for Kern — the open-source all-in-one work platform.',
+      logo: { light: './src/assets/kern-mark.svg', dark: './src/assets/kern-mark-dark.svg', alt: '' },
+      favicon: '/favicon.svg',
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/KernAIO' }],
-      customCss: ['./src/styles/kern.css'],
+      customCss: ['./src/styles/fonts.css', './src/styles/kern.css'],
       head: [
-        { tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.googleapis.com' } },
-        { tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: true } },
+        // The fonts are served from this origin (public/fonts). Nothing renders behind a
+        // third-party stylesheet, and no reader's IP reaches Google.
         {
           tag: 'link',
           attrs: {
-            rel: 'stylesheet',
-            href: 'https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400&family=DM+Mono:wght@400;500&display=swap',
+            rel: 'preload',
+            href: `${base}fonts/instrument-sans-400-700-latin.woff2`,
+            as: 'font',
+            type: 'font/woff2',
+            crossorigin: true,
           },
         },
+        {
+          tag: 'link',
+          attrs: {
+            rel: 'preload',
+            href: `${base}fonts/dm-mono-400-latin.woff2`,
+            as: 'font',
+            type: 'font/woff2',
+            crossorigin: true,
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: { name: 'theme-color', content: '#FBFAF7', media: '(prefers-color-scheme: light)' },
+        },
+        {
+          tag: 'meta',
+          attrs: { name: 'theme-color', content: '#1C1A17', media: '(prefers-color-scheme: dark)' },
+        },
       ],
+      // Code blocks wear the Ink/Paper surfaces. Only the metrics belong here — the
+      // colours are set in kern.css, because Expressive Code parses these values as
+      // colours at build time and silently drops anything it cannot read, var() included.
+      expressiveCode: {
+        themes: ['github-dark-default', 'github-light'],
+        styleOverrides: {
+          borderRadius: '10px',
+          borderWidth: '1px',
+          codeFontFamily: 'var(--sl-font-mono)',
+          codeFontSize: '0.8125rem',
+          codeLineHeight: '1.7',
+          codePaddingBlock: '0.875rem',
+          codePaddingInline: '1rem',
+          frames: {
+            frameBoxShadowCssValue: 'none',
+          },
+        },
+      },
       editLink: { baseUrl: 'https://github.com/KernAIO/docs/edit/main/' },
       lastUpdated: false,
       sidebar: [

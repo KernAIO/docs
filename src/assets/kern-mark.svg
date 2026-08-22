@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 144" width="144" height="144" role="img" aria-label="Kern">
+  <rect width="144" height="144" rx="36" fill="#1C1A17"/>
+  <!-- "K" as an outline, so the mark is identical everywhere: an SVG loaded as an
+       image cannot reach a web font, and the lettering would otherwise fall back. -->
+  <path d="M30.66 98.00V43.28H40.54V98.00ZM37.83 69.58 63.72 43.28H77.02L50.01 69.58ZM64.93 98.00 37.67 69.58H50.01L78.54 98.00Z" fill="#FBFAF7"/>
+  <rect x="88" y="44" width="9" height="56" rx="4.5" fill="#B4661C"/>
+</svg>
