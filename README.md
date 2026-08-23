@@ -6,7 +6,7 @@
 [![Licence](https://img.shields.io/badge/licence-AGPL--3.0-blue?style=flat-square)](LICENSE)
 [![Status](https://img.shields.io/badge/status-pre--1.0-orange?style=flat-square)](https://github.com/KernAIO/kern#what-works-today)
 [![Last commit](https://img.shields.io/github/last-commit/KernAIO/docs?style=flat-square)](https://github.com/KernAIO/docs/commits/main)
-[![Website](https://img.shields.io/badge/kernaio.com-1f2328?style=flat-square)](https://kernaio.com)
+[![Website](https://img.shields.io/badge/docs.kernaio.com-1f2328?style=flat-square)](https://docs.kernaio.com)
 
 The site people read is built from the Markdown in this repository. If something about
 [Kern](https://github.com/KernAIO/kern) was hard to work out, it belongs here.
@@ -45,12 +45,23 @@ pnpm build
 
 ## How it is published
 
-The site is **not published yet**. GitHub Pages has to be switched on for this repository first.
+The site's address is **[docs.kernaio.com](https://docs.kernaio.com)**. It is **not live yet**: the
+DNS record and GitHub Pages both still have to be switched on. Until then, build it locally.
 
 | Where | How |
 |---|---|
 | GitHub Pages | `.github/workflows/pages.yml`, started by hand from the Actions tab |
 | Docker | `docker build -t kern-docs .` serves the built site on port 80 |
+
+To publish it the first time:
+
+1. Point a `CNAME` record for `docs.kernaio.com` at `kernaio.github.io`.
+2. In Settings → Pages, set the source to **GitHub Actions** and the custom domain to
+   `docs.kernaio.com`.
+3. Run the **GitHub Pages** workflow from the Actions tab.
+
+**Expected result:** `https://docs.kernaio.com` serves this site. `public/CNAME` keeps the custom
+domain across later deploys, and the site is built at the root — there is no `/docs` path prefix.
 
 ## How to write here
 

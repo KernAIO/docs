@@ -17,8 +17,8 @@ jobs:
       - run: if [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile; else pnpm install; fi
         env: { NODE_AUTH_TOKEN: '${{ secrets.GITHUB_TOKEN }}' }
       - uses: actions/configure-pages@v5
+      # docs.kernaio.com serves the site at the root, so no DOCS_BASE.
       - run: pnpm build
-        env: { DOCS_BASE: /docs }
       - uses: actions/upload-pages-artifact@v3
         with: { path: dist }
   deploy:
