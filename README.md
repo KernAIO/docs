@@ -2,6 +2,12 @@
 
 **Kern's documentation site: how to install it, run it, and build modules for it.**
 
+[![CI](https://img.shields.io/github/actions/workflow/status/KernAIO/docs/ci.yml?branch=main&label=CI&style=flat-square)](https://github.com/KernAIO/docs/actions/workflows/ci.yml)
+[![Licence](https://img.shields.io/badge/licence-AGPL--3.0-blue?style=flat-square)](LICENSE)
+[![Status](https://img.shields.io/badge/status-pre--1.0-orange?style=flat-square)](https://github.com/KernAIO/kern#what-works-today)
+[![Last commit](https://img.shields.io/github/last-commit/KernAIO/docs?style=flat-square)](https://github.com/KernAIO/docs/commits/main)
+[![Website](https://img.shields.io/badge/kernaio.com-1f2328?style=flat-square)](https://kernaio.com)
+
 The site people read is built from the Markdown in this repository. If something about
 [Kern](https://github.com/KernAIO/kern) was hard to work out, it belongs here.
 
@@ -56,4 +62,7 @@ action, say what the reader should see.
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md). Licence: [AGPL-3.0](LICENSE).
 
-Website: [kernaio.com](https://kernaio.com).
+---
+
+**Kern** — one place for your team's work: issues, conversations, documents and people.
+Open source, self-hosted. [kernaio.com](https://kernaio.com) · [github.com/KernAIO](https://github.com/KernAIO)
