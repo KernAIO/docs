@@ -55,3 +55,5 @@ action, say what the reader should see.
 ## Contributing
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md). Licence: [AGPL-3.0](LICENSE).
+
+Website: [kernaio.com](https://kernaio.com).
