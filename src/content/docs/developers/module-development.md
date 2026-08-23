@@ -200,7 +200,44 @@ export default templateClient
 
 A client module can contribute `routes` (under `/(app)/[workspace]/<module>`), `nav`, `commands` (⌘K actions), `presenters` (how an object renders inline / as a card), `slots` (sidebar widgets, right-panel tabs, settings pages, notification renderers, chat message actions…), `shortcuts`, `notifications`, `settingsPages` and `messages` (i18n bundles). Components are Svelte 5 and loaded lazily.
 
-## 6. Hosting the module
+## 6. Dashboard widgets
+
+A module can put cards on the workspace home page by declaring `widgets`. The shell draws the frame
+— card, header, drag handle, menu, and the loading, empty and error states — so a widget component
+writes only a body.
+
+```ts title="src/client/index.ts"
+widgets: [
+  {
+    id: 'template.recent',            // `<module>.<widget>`; stored in saved layouts, so never rename
+    get title() { return m.template_recent_title() },
+    get description() { return m.template_recent_desc() },
+    icon: 'puzzle',
+    permission: 'template.note.view',
+    sizes: ['m', 'l'],                // only sizes you have actually looked at
+    defaultSize: 'm',
+    settings: [
+      { kind: 'number', key: 'limit', label: 'Rows', default: 6, min: 3, max: 20 },
+    ],
+    component: () => import('./widgets/RecentWidget.svelte'),
+  },
+]
+```
+
+The component receives `WidgetProps`: `instanceId`, `workspaceId`, `workspaceSlug`, the resolved
+`settings`, `size`, `span`, `columns`, `editing`, and a `configure()` callback.
+
+Three rules decide whether a widget is any good:
+
+- **Name the procedure before designing the card.** A widget shows data that already exists. If
+  nothing returns the number you want, add the procedure or drop the widget — do not approximate it.
+- **Put the settings in the query key.** `queryKey: [module, entity, workspaceId, settingsScope(settings)]`.
+  Without it the cached result is served and the setting appears to do nothing.
+- **Hide row actions while `editing` is true.** Somebody rearranging the board is not acting on it.
+
+A widget declaring a single number sets `compact: true` and draws no header of its own.
+
+## 7. Hosting the module
 
 Add the package to the host service's static registry (e.g. `core`'s `kern.modules.ts`) and to the app's module list. The kernel applies migrations, mounts `/api/template` (+ `/api/template/openapi.json`), registers procedures, jobs and subscriptions at start-up. Per-workspace enablement is handled by core — nothing to do in the module.
 

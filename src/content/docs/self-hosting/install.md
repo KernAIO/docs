@@ -7,10 +7,49 @@ Kern ships as a set of Docker images plus a `docker compose` file, a Caddy rever
 
 ## Requirements
 
-- A Linux host (or macOS for evaluation) with **Docker 24+** and the Compose plugin.
-- **4 GB RAM** minimum (8 GB recommended once several modules and LiveKit are in use), 2 vCPU, 20 GB disk.
-- A **domain name** pointing at the host for automatic HTTPS — or an IP address for LAN use (Caddy will issue a self-signed certificate).
-- Ports **80** and **443** open. For calls, additionally **7881/tcp** and **50000–50200/udp**.
+### The machine
+
+| | Minimum | Comfortable |
+|---|---|---|
+| CPU | 2 vCPU | 4 vCPU |
+| RAM | 4 GB | 8 GB |
+| Disk | 20 GB | 40 GB |
+| Suits | a team of about twenty, running issues, chat, docs and mail | calls and office previews switched on, mail syncing several accounts, or more than fifty people |
+
+The minimum is the smallest tier at most hosts. Disk is about 1.5 GB of images plus your database
+and your files — what people upload decides the real number.
+
+### The software
+
+- **Docker 24 or newer**, with the Compose plugin. Any Linux distribution. macOS runs it for a look,
+  not for a team.
+- **x86-64.** The published images are `amd64`. An arm64 server — Ampere, Graviton, a Raspberry Pi —
+  needs images built for it.
+- A **domain name** pointing at the host, for automatic HTTPS. An IP address works for a machine on
+  your network; Caddy then issues a self-signed certificate.
+- Ports **80** and **443** open. Calls add **7881/tcp** and **50000–50200/udp**.
+- No outbound access, once the images are pulled. An instance with no route to the internet runs the
+  same — it only loses the update check.
+
+### How much memory it uses
+
+Measured on a fresh instance with no traffic:
+
+| Container | At rest | What it is |
+|---|---|---|
+| `minio` | 81 MB | file storage |
+| `core` | 67 MB | accounts, permissions and most modules |
+| `postgres` | 35 MB | the database |
+| `caddy` | 12 MB | TLS and routing |
+| `gotenberg` | 11 MB | office and PDF previews (optional) |
+| `valkey` | 9 MB | cache, presence, rate limits |
+| `nats` | 8 MB | events |
+
+`core` is the largest of the six Kern services — it hosts the most modules. `app`, `chat`, `mail`,
+`collab` and `core-worker` each host less and use less. The whole base stack idles under 700 MB.
+
+So the 4 GB is not for idling. It is the room Postgres uses to cache your data, and the room the
+services use while your team is working.
 
 ## One-line install
 
@@ -48,6 +87,13 @@ docker compose up -d
 ```
 
 See the [Environment reference](/self-hosting/env-reference/) for every variable.
+
+## Install on a PaaS
+
+If your server is already managed by [Coolify](https://coolify.io), neither the installer nor the
+manual steps above apply — Coolify holds the ports, issues the certificate and keeps the
+environment. Kern ships a Compose file written for it, and there is no script to pipe into bash.
+See [Install on Coolify](/self-hosting/coolify/).
 
 ## What gets started
 

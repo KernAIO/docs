@@ -29,6 +29,20 @@ Each module may declare a **settings schema**. Settings are edited under **Works
 
 Instance admins can set which modules are enabled by default for new workspaces, and can hide modules instance-wide.
 
+## Versions
+
+A module's version is the version of the package it ships in, and every module in an instance moves
+with the platform: an upgrade replaces all of them at once. The modules list shows the version each
+module currently reports, and — when a newer release is available and you are an instance admin —
+where that release would move it.
+
+A module can declare the oldest platform it runs on. When it does, the requirement is shown next to
+it, and Kern refuses to start when the version it runs on does not satisfy it. First-party modules
+rarely need this, because they are released together with everything else. It matters for a custom
+build, where a module package and the images around it can move separately.
+
+See [Upgrading](/self-hosting/upgrading/) for how to apply a release.
+
 ## Third-party modules
 
 v1.0 ships **no runtime loading of third-party code**: the set of modules is fixed at build time for security and type safety. Third parties can still extend Kern through the public API, outgoing/incoming webhooks, OAuth apps and an iframe/web-component "remote UI" slot. Building your own module package and a custom build is supported and documented in [Module development](/developers/module-development/).
