@@ -130,6 +130,7 @@ export default defineConfig({
           label: 'Contributing',
           items: [
             { label: 'Conventions', slug: 'contributing/conventions' },
+            { label: 'Translating Kern', slug: 'contributing/translating' },
             { label: 'Contributor License Agreement', slug: 'contributing/cla' },
             { label: 'Code of Conduct', slug: 'contributing/code-of-conduct' },
           ],
