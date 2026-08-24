@@ -11,4 +11,4 @@ Harassment, discrimination or personal attacks are not tolerated in issues, pull
 
 ## Reporting
 
-Report unacceptable behaviour to **conduct@kern.dev**, or open a private security advisory on GitHub if you prefer that channel. Reports are handled confidentially by the maintainers.
+Report unacceptable behaviour to **conduct@kernaio.com**, or open a private security advisory on GitHub if you prefer that channel. Reports are handled confidentially by the maintainers.
