@@ -75,7 +75,13 @@ action, say what the reader should see.
 
 ## Contributing
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md). Licence: [AGPL-3.0](LICENSE).
+Read [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Licence
+
+[AGPL-3.0-only](LICENSE). This repository is part of the Kern product.
+The Kern framework you build modules against is Apache-2.0 — see
+[LICENSING.md](https://github.com/KernAIO/kern/blob/main/LICENSING.md).
 
 ---
 

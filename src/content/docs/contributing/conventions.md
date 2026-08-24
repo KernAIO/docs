@@ -31,4 +31,4 @@ description: Commit messages, code style, testing and release conventions across
 
 ## Licensing
 
-All code is AGPL-3.0-only; dependencies must be MIT/Apache/BSD-compatible. Contributions require the [CLA](/contributing/cla/).
+The framework (`kernel` repo, plus `_template` and `workflow` in `modules`) is Apache-2.0; the product is AGPL-3.0-only. The file you are editing tells you which applies — see [Licensing](/developers/licensing/). Dependencies must be MIT/Apache/BSD/ISC. Contributions require the [CLA](/contributing/cla/).

@@ -120,6 +120,21 @@ Nothing closes immediately.
 A suspended workspace is **read-only**. Everyone can still sign in, read and export what is theirs.
 Nothing is deleted. Paying, or resuming the workspace from **Admin → Subscriptions**, restores it.
 
+## Is this allowed?
+
+Yes. Kern is AGPL-3.0-only, and the AGPL does not restrict what you charge or who you charge it to.
+Sell seats on your instance, host it for clients, build a business on it.
+
+Two things are asked of you:
+
+- **Publish your changes.** If you modify Kern and let other people use it over a network, the AGPL
+  requires you to offer them the source of your modified version. Running it unmodified asks nothing
+  of you at all.
+- **Use your own name.** The code is open; the name is not. Do not call your service Kern, Kern Cloud
+  or anything a customer would read as us. See
+  [TRADEMARK.md](https://github.com/KernAIO/kern/blob/main/TRADEMARK.md) — it also describes the
+  **Kern Certified Host** programme, which is how you *can* use the name.
+
 ## Turning it off
 
 Remove `STRIPE_SECRET_KEY` from `.env` and restart.

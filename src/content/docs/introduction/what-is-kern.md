@@ -22,7 +22,7 @@ Everything is **multi-workspace**: an instance hosts any number of workspaces (c
 ## Who it is for
 
 - Teams that want Jira/Slack/Notion-class tooling without three vendors and three bills.
-- Organisations that need to **own their data** — Kern runs on your servers under the AGPL-3.0.
+- Organisations that need to **own their data** — Kern runs on your servers, under an open-source licence.
 - Agencies and consultancies that run many clients as separate workspaces from one installation.
 
 ## Self-host vs Kern Cloud
@@ -35,4 +35,6 @@ Kern is a Svelte 5 / SvelteKit progressive web app backed by Node 24 services: `
 
 ## Licence
 
-All public repositories are **AGPL-3.0**; contributions are accepted under a [CLA](/contributing/cla/). You may self-host, modify and redistribute Kern; if you offer a modified Kern as a service, the AGPL requires you to publish your changes.
+Kern uses two licences. The **framework** you build modules against — `@kernhq/kernel`, `@kernhq/contracts`, `@kernhq/sdk`, `@kernhq/ui` and the module template — is **Apache-2.0**, so a module you write is yours to licence however you like, closed and commercial included. The **product** — `app`, `core`, `chat`, `mail`, `collab`, `docs` and the first-party modules — is **AGPL-3.0-only**: self-host, modify and redistribute freely, but if you offer a modified Kern as a service you publish your changes.
+
+Contributions are accepted under a [CLA](/contributing/cla/). Full detail: [Licensing](/developers/licensing/).

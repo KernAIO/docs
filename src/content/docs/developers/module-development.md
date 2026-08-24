@@ -5,6 +5,10 @@ description: Build a Kern module — package shape, contract, server, schema, mi
 
 Every feature in Kern is a module, and first-party modules use exactly the same shape you would. The quickest start is to copy `packages/_template` in the [`modules`](https://github.com/KernAIO/modules) repository. This page walks through it file by file.
 
+:::note[Your module is yours]
+The template and everything a module imports — `@kernhq/kernel`, `@kernhq/contracts`, `@kernhq/sdk`, `@kernhq/ui` — are Apache-2.0. Licence your module however you like, keep it private, keep it closed, sell it. See [Licensing](/developers/licensing/).
+:::
+
 ## Package shape
 
 A module is an npm package named `@kernhq/module-<id>` that exports three entry points (plus its SQL migrations):

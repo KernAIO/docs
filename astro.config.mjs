@@ -118,6 +118,7 @@ export default defineConfig({
           items: [
             { label: 'Architecture', slug: 'developers/architecture' },
             { label: 'Repositories', slug: 'developers/repositories' },
+            { label: 'Licensing', slug: 'developers/licensing' },
             { label: 'Dev workspace', slug: 'developers/dev-workspace' },
             { label: 'Module development', slug: 'developers/module-development' },
             { label: 'Releases and migrations', slug: 'developers/releases-and-migrations' },

@@ -5,15 +5,15 @@ description: What you agree to when contributing to any KernAIO repository.
 
 Contributions to any KernAIO repository are accepted under the Kern **Contributor License Agreement** (the full text is `CLA.md` in every repository). In short:
 
-1. **Copyright licence** — you grant KernAIO and recipients of Kern a perpetual, worldwide, non-exclusive, royalty-free, irrevocable licence to use, modify, sublicense and distribute your contribution **under any licence**, including AGPL-3.0 and the proprietary licences used for Kern Cloud / enterprise offerings.
+1. **Copyright licence** — you grant KernAIO and recipients of Kern a perpetual, worldwide, non-exclusive, royalty-free, irrevocable licence to use, modify, sublicense and distribute your contribution **under any licence**, including the AGPL-3.0 and Apache-2.0 licences Kern uses (see [Licensing](/developers/licensing/)) and the proprietary licences used for Kern Cloud / enterprise offerings.
 2. **Patent licence** — you grant a similar licence for any patent claims you hold that your contribution necessarily infringes.
 3. **You keep ownership** of your contribution; the CLA grants licences, it does not transfer copyright.
 4. **Original work** — you confirm the contribution is yours to give (or that your employer has agreed), and does not knowingly violate third-party rights.
 5. **No obligation** on KernAIO to merge, and **no warranty** from you.
 
-## Why a CLA with AGPL?
+## Why a CLA?
 
-The AGPL guarantees that Kern and every modified hosted version stays open. The CLA keeps the option of dual-licensing (e.g. enterprise add-ons or Kern Cloud) and of relicensing the project as a whole if that ever becomes necessary — without having to track down every past contributor. This is the same model used by projects like Plane, Twenty and Mattermost.
+The AGPL guarantees that Kern and every modified hosted version stays open. The CLA is what lets us hold both licences at once — it is the reason the framework could be moved to Apache-2.0 so that you can write closed modules, without tracking down every past contributor. It also keeps the option of dual-licensing for Kern Cloud and enterprise offerings. This is the same model used by projects like Plane, Twenty and Mattermost.
 
 ## How to sign
 

@@ -3,7 +3,7 @@ title: Repositories
 description: The GitHub repositories that make up Kern and what each contains.
 ---
 
-Kern lives in the GitHub organisation [`KernAIO`](https://github.com/KernAIO). All public repositories are AGPL-3.0 with a CLA.
+Kern lives in the GitHub organisation [`KernAIO`](https://github.com/KernAIO). Every public repository takes contributions under a CLA. `kernel` is Apache-2.0; the rest are AGPL-3.0-only, except `_template` and `workflow` inside `modules`, which are Apache-2.0. See [Licensing](/developers/licensing/).
 
 | Repo | What |
 |---|---|
