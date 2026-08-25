@@ -17,4 +17,9 @@ FROM nginx:alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/html
 EXPOSE 80
-HEALTHCHECK CMD wget -qO- http://localhost/ >/dev/null || exit 1
+# nginx binds a moment after the container starts. Without an explicit start period the first
+# probe fails on connection refused, and Docker's default 30s interval means the second one
+# does not run until long after a deploy gate has given up — Coolify polls ten times, reads the
+# same stale failure each time, and rolls the release back on a container that is actually fine.
+HEALTHCHECK --interval=10s --timeout=5s --start-period=15s --retries=5 \
+  CMD wget -qO- http://localhost/ >/dev/null || exit 1
