@@ -22,4 +22,4 @@ EXPOSE 80
 # does not run until long after a deploy gate has given up — Coolify polls ten times, reads the
 # same stale failure each time, and rolls the release back on a container that is actually fine.
 HEALTHCHECK --interval=10s --timeout=5s --start-period=15s --retries=5 \
-  CMD wget -qO- http://localhost/ >/dev/null || exit 1
+  CMD wget -qO- http://127.0.0.1/ >/dev/null || exit 1
