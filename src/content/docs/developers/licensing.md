@@ -43,9 +43,9 @@ nothing and need no permission.
 **Change it.** Modify any part. If you distribute your modified version, or let other people use it
 over a network, the AGPL requires you to publish those changes under the AGPL.
 
-**Sell it.** You may run Kern as a paid service for other people — see
-[Selling seats](/self-hosting/billing/). Two conditions: publish your modifications, and do not call
-it Kern. The code is open; the name is not.
+**Run it for other people.** The licences govern the code, not what you may charge for running it —
+see [Billing](/self-hosting/billing/). Two conditions: publish your modifications, and do not call it
+Kern. The code is open; the name is not.
 
 **Write modules.** Private, commercial, closed — all fine.
 

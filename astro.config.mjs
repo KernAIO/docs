@@ -85,7 +85,7 @@ export default defineConfig({
             { label: 'Reverse proxy & TLS', slug: 'self-hosting/reverse-proxy-tls' },
             { label: 'Upgrading', slug: 'self-hosting/upgrading' },
             { label: 'Backups', slug: 'self-hosting/backups' },
-            { label: 'Selling seats', slug: 'self-hosting/billing' },
+            { label: 'Billing', slug: 'self-hosting/billing' },
             { label: 'Environment reference', slug: 'self-hosting/env-reference' },
           ],
         },
