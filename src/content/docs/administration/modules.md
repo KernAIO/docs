@@ -10,7 +10,7 @@ Kern's features are delivered as **modules**. The build of Kern you run contains
 | | Examples | Can be disabled? |
 |---|---|---|
 | **Core** | identity, workspaces, members, permissions, notifications, settings, files, search, activity | No — always enabled |
-| **Optional** | tracker, chat, docs, drive, calendar, hr, recruit, crm, automation, mail, calls, ai, time | Yes, per workspace |
+| **Optional** | tracker, chat, quire, drive, calendar, hr, recruit, crm, automation, mail, calls, ai, time | Yes, per workspace |
 
 ## Enabling and disabling
 

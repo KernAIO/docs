@@ -25,9 +25,9 @@ Projects, work-item types with hierarchy (Initiative › Epic › Story/Task/Bug
 
 Public/private channels, DMs, group DMs and object channels; threads, reactions, mentions, read state and unread counters, pins, bookmarks, search, file sharing, link unfurls, typing and presence, mute/DnD, slash commands, bots and webhooks, message → issue/doc actions, huddles, export. Cross-workspace shared channels are *v1.x*.
 
-## Docs, Drive & Calendar
+## Quire, Drive & Calendar
 
-Spaces and nested pages with real-time collaboration, comments, embeds, templates, version history, public links and export; folders, resumable uploads, file versions, share links with expiry/password, previews, trash and quotas; personal/team calendars with recurring events, reminders and overlays. Whiteboards, WebDAV and CalDAV/Google sync are *v1.x*.
+Spaces and nested pages with real-time collaboration, comments anchored to the text, version history with publish and restore, and a database engine with typed columns, filters, relations, rollups and formulas; folders, resumable uploads, file versions, share links with expiry/password, previews, trash and quotas; personal/team calendars with recurring events, reminders and overlays. Embeds, templates, public links, export, whiteboards, WebDAV and CalDAV/Google sync are *v1.x*.
 
 ## HR, Recruiting, CRM
 

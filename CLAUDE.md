@@ -89,6 +89,14 @@ Astro Starlight, themed with the Kern paper palette. Runs on **:4400**.
 **Things worth knowing**
 - Content lives in `src/content/docs/`. The sidebar is configured in `astro.config.mjs`; a new page
   needs an entry there.
+- **Starlight checks a sidebar `slug` and nothing checks a Markdown link**, so `pnpm build` used to
+  pass over a link that 404s for every reader. `scripts/check-links.mjs` runs as the second half of
+  `build`: it walks the emitted HTML and fails when an internal href — or a `#fragment` — resolves
+  to nothing. It reads `DOCS_BASE` the way `astro.config.mjs` does, so it is the *built* layout it
+  checks, not the source. Run it alone with `pnpm check:links` against an existing `dist/`.
+- **Renaming a content file changes a live URL on docs.kernaio.com, and nothing redirects.** No
+  `redirects` are configured. Retitle a page and relabel it in the sidebar; leave the filename
+  alone. `modules/docs-drive.md` is titled "Drive & Calendar" for exactly this reason.
 - Deployment is manual (`workflow_dispatch`) until GitHub Pages is enabled on the repository.
 - Write for someone who has never seen Kern. Anything that assumes context from the other repositories
   belongs in the Developers section, with a link to the source.

@@ -9,8 +9,8 @@ Kern is an open-source, self-hostable **all-in-one work platform**. Instead of s
 
 - **Tracker** — issues and projects with custom work-item types, hierarchy levels, custom fields, workflows with conditions/validators/post-functions, boards, sprints, roadmaps, a JQL-style query language (KQL), reports and time tracking.
 - **Chat** — channels, DMs, threads, reactions, mentions, read state, file sharing, slash commands and bots, plus *object channels* attached to any issue, candidate or deal.
-- **Docs & Drive** — a Notion-style wiki with real-time collaborative editing, plus folders, versions, share links and previews.
-- **Calendar** — personal and team calendars with overlays for sprints, leaves and interviews.
+- **Quire** — a Notion-style wiki: spaces, nested pages, real-time collaborative editing, version history and comments anchored to the text.
+- **Drive & Calendar** — folders, file versions, share links and previews; personal and team calendars with overlays for sprints, leaves and interviews.
 - **HR, Recruiting, CRM** — employees and org chart, leave and approvals, vacancies and pipelines, contacts, companies and deals.
 - **Automation** — trigger → condition → action rules with branches and smart values, scheduled rules and sandboxed scripts.
 - **Mail** — outbound providers per workspace, and a per-user IMAP/SMTP inbox that links email to issues, contacts and candidates.

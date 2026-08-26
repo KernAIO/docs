@@ -28,7 +28,7 @@ Invitations can be sent by email or by picking people from workspaces you alread
 
 ## Modules
 
-A **module** is a unit of functionality — `tracker`, `chat`, `docs`, `hr`, `mail`, … — packaged as an npm package that exports a `contract`, a `server` part and a `client` part. Modules declare their permissions, events, settings schema, object types, jobs and routes. A small set of modules is **core** and always enabled; everything else can be switched on or off per workspace. See [Modules](/administration/modules/) for the admin view and [Module development](/developers/module-development/) for the developer view.
+A **module** is a unit of functionality — `tracker`, `chat`, `quire`, `hr`, `mail`, … — packaged as an npm package that exports a `contract`, a `server` part and a `client` part. Modules declare their permissions, events, settings schema, object types, jobs and routes. A small set of modules is **core** and always enabled; everything else can be switched on or off per workspace. See [Modules](/administration/modules/) for the admin view and [Module development](/developers/module-development/) for the developer view.
 
 ## Permissions
 

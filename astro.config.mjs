@@ -103,7 +103,8 @@ export default defineConfig({
           items: [
             { label: 'Tracker', slug: 'modules/tracker' },
             { label: 'Chat', slug: 'modules/chat' },
-            { label: 'Docs, Drive & Calendar', slug: 'modules/docs-drive' },
+            { label: 'Quire', slug: 'modules/quire' },
+            { label: 'Drive & Calendar', slug: 'modules/docs-drive' },
             { label: 'HR', slug: 'modules/hr' },
             { label: 'Recruiting', slug: 'modules/recruiting' },
             { label: 'CRM', slug: 'modules/crm' },

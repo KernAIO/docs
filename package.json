@@ -12,7 +12,8 @@
   "scripts": {
     "dev": "astro dev --port 4400",
     "start": "astro preview --port 4400",
-    "build": "astro build",
+    "build": "astro build && node scripts/check-links.mjs",
+    "check:links": "node scripts/check-links.mjs",
     "preview": "astro preview --port 4400",
     "lint": "biome check .",
     "format": "biome format --write .",
