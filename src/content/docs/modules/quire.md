@@ -264,7 +264,7 @@ No dates and no promises — this is what has no code today:
 - embeds of issues, files or other pages
 - tables and images in the editor
 - any interface for databases
-- the `@` menu in the comment composer
+- the `@` menu in the page editor and the comment composer
 - a trash screen
 - drag-and-drop in the page tree
 - a space settings screen
