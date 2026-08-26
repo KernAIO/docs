@@ -171,7 +171,7 @@ The script asks you to type `restore` before it does this.
 2. Check whether the release lists new environment variables. The preflight also refuses to run when
    one is missing.
 3. If you customised `Caddyfile` or `docker-compose.yml`, compare them with the new versions in the
-   [`kern` repository](https://github.com/KernAIO/kern/tree/main/selfhost).
+   [`app` repository](https://github.com/KernAIO/app/tree/main/selfhost).
 
 ## Skipping versions
 

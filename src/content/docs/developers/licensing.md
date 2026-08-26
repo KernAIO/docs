@@ -82,7 +82,7 @@ the hosted business for nothing. Splitting at the framework boundary gets both â
 Kern, and anyone who hosts a modified Kern has to publish what they changed.
 
 The full reasoning, including what was rejected, is in
-[ADR 0005](https://github.com/KernAIO/kern/blob/main/docs/adr/0005-licensing-and-the-module-boundary.md).
+[ADR 0005](https://github.com/KernAIO/app/blob/main/docs/adr/0005-licensing-and-the-module-boundary.md).
 The canonical map is
-[LICENSING.md](https://github.com/KernAIO/kern/blob/main/LICENSING.md), and name usage is covered by
-[TRADEMARK.md](https://github.com/KernAIO/kern/blob/main/TRADEMARK.md).
+[LICENSING.md](https://github.com/KernAIO/app/blob/main/LICENSING.md), and name usage is covered by
+[TRADEMARK.md](https://github.com/KernAIO/app/blob/main/TRADEMARK.md).

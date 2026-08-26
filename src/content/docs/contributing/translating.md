@@ -14,9 +14,9 @@ reviewer; Persian was not. All four want your eyes.
 ## The files
 
 ```
-repos/app/messages/en.json      the source — every key starts here
-repos/app/messages/{ar,de,fa,tr}.json
-repos/app/messages/GLOSSARY.md  one English noun, one translation per language
+repos/shell/messages/en.json      the source — every key starts here
+repos/shell/messages/{ar,de,fa,tr}.json
+repos/shell/messages/GLOSSARY.md  one English noun, one translation per language
 ```
 
 English is the source language. A key exists in `en.json` first and every other file follows it.
@@ -24,7 +24,7 @@ English is the source language. A key exists in `en.json` first and every other 
 ## Improving a language
 
 ```bash
-cd repos/app
+cd repos/shell
 pnpm i18n:missing de       # what German is missing, with the English for each key
 # edit messages/de.json
 pnpm exec biome format --write messages/
@@ -100,7 +100,7 @@ English does, and those are listed so the check stays quiet about them and loud 
 ## Adding a language
 
 ```bash
-cd repos/app
+cd repos/shell
 node scripts/i18n.mjs new nl     # declares it, creates the file, prints what is left
 node scripts/i18n.mjs fill nl    # writes every key as a TODO stub, shaped for your plural forms
 ```
@@ -118,7 +118,7 @@ Never translate those by hand; there are 519 of them.
 ## Before you open a pull request
 
 ```bash
-cd repos/app
+cd repos/shell
 node scripts/check-i18n.mjs
 pnpm exec biome format --write messages/
 ```

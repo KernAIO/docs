@@ -8,7 +8,7 @@ server, issues the certificate, keeps the environment and redeploys on a button.
 do not run the installer. You add one Docker Compose resource, give it a domain, and deploy.
 
 Kern ships a Compose file written for this:
-[`selfhost/coolify/docker-compose.yml`](https://github.com/KernAIO/kern/blob/main/selfhost/coolify/docker-compose.yml).
+[`selfhost/coolify/docker-compose.yml`](https://github.com/KernAIO/app/blob/main/selfhost/coolify/docker-compose.yml).
 It is the normal stack with the host-shaped parts removed — nothing is published on port 80 or 443,
 no files are mounted, and every secret comes from a Coolify magic variable.
 
@@ -37,7 +37,7 @@ You can deploy straight from the Kern repository, which is the path that keeps u
 2. Enter the repository URL:
 
    ```
-   https://github.com/KernAIO/kern
+   https://github.com/KernAIO/app
    ```
 
 3. Set **Build Pack** to **Docker Compose**.

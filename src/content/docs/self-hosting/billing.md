@@ -130,7 +130,7 @@ of anyone operating Kern for other people:
   of you at all.
 - **Use your own name.** The code is open; the name is not. Do not call your service Kern, Kern Cloud
   or anything a customer would read as us. See
-  [TRADEMARK.md](https://github.com/KernAIO/kern/blob/main/TRADEMARK.md) for where the lines sit.
+  [TRADEMARK.md](https://github.com/KernAIO/app/blob/main/TRADEMARK.md) for where the lines sit.
 
 ## Turning it off
 

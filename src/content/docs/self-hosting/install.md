@@ -54,7 +54,7 @@ services use while your team is working.
 ## One-line install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/KernAIO/kern/main/selfhost/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/KernAIO/app/main/selfhost/install.sh | bash
 ```
 
 The script is short and readable; you are encouraged to inspect it first. It does the following:
@@ -77,7 +77,7 @@ If you prefer not to pipe a script into bash:
 
 ```bash
 mkdir -p ~/kern/postgres-init && cd ~/kern
-RAW=https://raw.githubusercontent.com/KernAIO/kern/main/selfhost
+RAW=https://raw.githubusercontent.com/KernAIO/app/main/selfhost
 for f in docker-compose.yml Caddyfile livekit.yaml .env.example postgres-init/01-extensions.sql; do
   curl -fsSL "$RAW/$f" -o "$f"
 done

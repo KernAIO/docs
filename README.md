@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://raw.githubusercontent.com/KernAIO/kern/main/assets/kern-mark.svg" width="56" alt="">
+<img src="https://raw.githubusercontent.com/KernAIO/app/main/assets/kern-mark.svg" width="56" alt="">
 </p>
 
 # docs
@@ -8,12 +8,12 @@
 
 [![CI](https://img.shields.io/github/actions/workflow/status/KernAIO/docs/ci.yml?branch=main&label=CI&style=flat-square)](https://github.com/KernAIO/docs/actions/workflows/ci.yml)
 [![Licence](https://img.shields.io/badge/licence-AGPL--3.0-blue?style=flat-square)](LICENSE)
-[![Status](https://img.shields.io/badge/status-pre--1.0-orange?style=flat-square)](https://github.com/KernAIO/kern#what-works-today)
+[![Status](https://img.shields.io/badge/status-pre--1.0-orange?style=flat-square)](https://github.com/KernAIO/app#what-works-today)
 [![Last commit](https://img.shields.io/github/last-commit/KernAIO/docs?style=flat-square)](https://github.com/KernAIO/docs/commits/main)
 [![Website](https://img.shields.io/badge/docs.kernaio.com-1f2328?style=flat-square)](https://docs.kernaio.com)
 
 The site people read is built from the Markdown in this repository. If something about
-[Kern](https://github.com/KernAIO/kern) was hard to work out, it belongs here.
+[Kern](https://github.com/KernAIO/app) was hard to work out, it belongs here.
 
 ## Work on the documentation
 
@@ -81,7 +81,7 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md).
 
 [AGPL-3.0-only](LICENSE). This repository is part of the Kern product.
 The Kern framework you build modules against is Apache-2.0 — see
-[LICENSING.md](https://github.com/KernAIO/kern/blob/main/LICENSING.md).
+[LICENSING.md](https://github.com/KernAIO/app/blob/main/LICENSING.md).
 
 ---
 

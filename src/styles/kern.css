@@ -1,7 +1,7 @@
 /*
  * Kern "Ink / Paper" theme for Starlight.
  *
- * The palette is the one in repos/app/DESIGN.md, and the proportions follow kernaio.com:
+ * The palette is the one in repos/shell/DESIGN.md, and the proportions follow kernaio.com:
  * warm paper greys, near-black ink, one burnt-orange accent used sparingly, and depth from
  * 1px hairlines rather than shadows. Starlight's own variables are mapped onto those tokens
  * at the top, so the rest of this file only has to correct spacing and typography.

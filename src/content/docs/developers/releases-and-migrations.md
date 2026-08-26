@@ -95,7 +95,7 @@ written by hand.
   "version": "1.2.0",
   "channel": "stable",
   "publishedAt": "2026-08-22T09:00:00.000Z",
-  "notesUrl": "https://github.com/KernAIO/kern/releases/tag/v1.2.0",
+  "notesUrl": "https://github.com/KernAIO/app/releases/tag/v1.2.0",
   "services": { "app": "1.2.0", "core": "1.2.0" },
   "modules": { "core": "0.3.0", "tracker": "0.2.0", "chat": "0.2.1" },
   "minPreviousVersion": "1.0.0",

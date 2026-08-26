@@ -71,4 +71,4 @@ One WebSocket per client to `chat`; events `{ workspaceId, module, entity, id, o
 
 ## Further reading
 
-- `docs/PLAN.md` and `docs/adr/` in the [`kern`](https://github.com/KernAIO/kern) repository for the full plan and decision records.
+- `docs/PLAN.md` and `docs/adr/` in the [`app`](https://github.com/KernAIO/app) repository for the full plan and decision records.

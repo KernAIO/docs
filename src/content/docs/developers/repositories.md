@@ -7,8 +7,8 @@ Kern lives in the GitHub organisation [`KernAIO`](https://github.com/KernAIO). E
 
 | Repo | What |
 |---|---|
-| [`kern`](https://github.com/KernAIO/kern) | project face: README, **self-host** distribution (`docker-compose.yml`, profiles, `install.sh`, `Caddyfile`), architecture/ADR docs, the **umbrella dev workspace** (`pnpm-workspace.yaml` linking sibling clones), release manifests, CLA |
-| [`app`](https://github.com/KernAIO/app) | SvelteKit PWA; hosts every module's client part |
+| [`app`](https://github.com/KernAIO/app) | project face: README, **self-host** distribution (`docker-compose.yml`, profiles, `install.sh`, `Caddyfile`), architecture/ADR docs, the **umbrella dev workspace** (`pnpm-workspace.yaml` linking sibling clones), release manifests, CLA |
+| [`shell`](https://github.com/KernAIO/shell) | SvelteKit PWA; hosts every module's client part |
 | [`core`](https://github.com/KernAIO/core) | identity, workspaces, permissions, notifications, settings, files, search + first-party modules (Fastify + kernel); `worker` entrypoint |
 | [`chat`](https://github.com/KernAIO/chat) | chat module + realtime WebSocket gateway |
 | [`mail`](https://github.com/KernAIO/mail) | outbound providers, IMAP/SMTP inbox, inbound intake |
@@ -25,4 +25,4 @@ Shared packages are published to GitHub Packages under the `@kernhq` scope on ev
 
 ## Images
 
-Each service repo builds `ghcr.io/kernaio/<service>` on push to `main` and on `v*` tags. The `kern` repository pins the set of tags that form a release.
+Each service repo builds `ghcr.io/kernaio/<service>` on push to `main` and on `v*` tags. The `app` repository pins the set of tags that form a release.

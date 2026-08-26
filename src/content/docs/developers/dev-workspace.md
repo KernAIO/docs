@@ -13,7 +13,7 @@ Kern is many repositories, but day to day it feels like one monorepo thanks to t
 ## Setup
 
 ```bash
-git clone https://github.com/KernAIO/kern && cd kern
+git clone https://github.com/KernAIO/app && cd app
 pnpm setup        # clones app core chat mail collab kernel modules docs into ./repos and installs deps
 pnpm infra        # Postgres 18 (pgvector) · NATS · Valkey · MinIO · Mailpit  — docker compose -f dev/compose.yml up -d
 cp dev/.env.example .env   # (setup does this) shared dev environment
