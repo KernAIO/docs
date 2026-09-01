@@ -97,7 +97,10 @@ Astro Starlight, themed with the Kern paper palette. Runs on **:4400**.
 - **Renaming a content file changes a live URL on docs.kernaio.com, and nothing redirects.** No
   `redirects` are configured. Retitle a page and relabel it in the sidebar; leave the filename
   alone. `modules/docs-drive.md` is titled "Drive & Calendar" for exactly this reason.
-- Deployment is manual (`workflow_dispatch`) until GitHub Pages is enabled on the repository.
+- **Serving: docs.kernaio.com, fronted by Navid's own Cloudflare — not GitHub Pages.** The old
+  `pages.yml` (GitHub Actions → actions/deploy-pages) was removed on 2026-09-01: GitHub Pages was
+  never enabled on this repository (Pages API 404) and the live domain is served outside it.
+  Deployment of new builds happens outside this repository's workflows.
 - Write for someone who has never seen Kern. Anything that assumes context from the other repositories
   belongs in the Developers section, with a link to the source.
 - `src/styles/kern.css` maps Starlight's variables onto the Ink/Paper tokens from `shell/DESIGN.md`,
