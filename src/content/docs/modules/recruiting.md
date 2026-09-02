@@ -3,6 +3,11 @@ title: Recruiting
 description: Vacancies, candidates, pipelines, interviews, scorecards, offers and a public career page.
 ---
 
+:::caution[Planned. Not in a release yet.]
+This page describes what the module will do. No Recruiting module ships today; see the
+[roadmap](https://github.com/KernAIO/app/blob/main/ROADMAP.md).
+:::
+
 An applicant-tracking system that reuses Kern's workflow engine, calendar, calls and mail.
 
 - **Vacancies** with hiring team, location, description and pipeline template.

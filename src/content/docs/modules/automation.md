@@ -3,6 +3,12 @@ title: Automation
 description: Rules built from triggers, conditions, actions and branches; scheduled rules; sandboxed scripts.
 ---
 
+:::caution[Planned. Not in a release yet.]
+This page describes what the module will do. No Automation module ships today; the tracker's
+workflows (conditions, validators, post-functions) are what exists. See the
+[roadmap](https://github.com/KernAIO/app/blob/main/ROADMAP.md).
+:::
+
 Automation lets you encode process without code — and with code when you need it.
 
 ## Rules

@@ -3,6 +3,12 @@ title: AI assistant
 description: Bring-your-own-key AI features — summaries, drafting, semantic search, the @kern bot and automation steps.
 ---
 
+:::caution[Planned. Not in a release yet.]
+This page describes what the module will do. No AI module ships today; what exists is the
+[MCP server](/administration/mcp/), which lets an AI client you already use act on Kern. See the
+[roadmap](https://github.com/KernAIO/app/blob/main/ROADMAP.md).
+:::
+
 AI in Kern is opt-in, per workspace, and uses **your** provider and keys. Nothing is sent to any model unless a workspace admin configures a provider.
 
 ## Providers

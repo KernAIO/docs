@@ -3,6 +3,12 @@ title: Calls
 description: Audio/video calls, screen sharing and huddles powered by LiveKit.
 ---
 
+:::caution[Planned. Not in a release yet.]
+This page describes what the module will do. The `--profile calls` Compose profile starts a
+LiveKit server, but no module places a call yet. See the
+[roadmap](https://github.com/KernAIO/app/blob/main/ROADMAP.md).
+:::
+
 Calls are built on [LiveKit](https://livekit.io/) (Apache-2.0), started with the `--profile calls` Compose profile.
 
 - **1:1 and group** audio/video from a chat conversation, a calendar event or a recruiting interview.

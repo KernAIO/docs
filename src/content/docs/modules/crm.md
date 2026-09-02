@@ -3,6 +3,11 @@ title: CRM
 description: Contacts, companies, leads, deals and pipelines with activities and links to mail and calls.
 ---
 
+:::caution[Planned. Not in a release yet.]
+This page describes what the module will do. No CRM module ships today; see the
+[roadmap](https://github.com/KernAIO/app/blob/main/ROADMAP.md).
+:::
+
 A light but complete CRM for teams that sell as well as build.
 
 - **Contacts** and **companies** with custom fields, tags and ownership.
