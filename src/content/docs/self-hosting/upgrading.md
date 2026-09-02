@@ -6,6 +6,12 @@ description: How to move a self-hosted Kern instance to a newer release, and how
 Kern is released as one platform. Every service image and every module inside it carries the same
 version, and an upgrade moves all of them together. There is no per-module upgrade.
 
+A release is cut every night that something changed. It carries the newest version of every module
+that works with that platform, and its
+[release notes](https://github.com/KernAIO/app/releases) list what each service and each module
+changed since the release before it. **Admin → Updates** shows the same list for the release your
+instance would move to.
+
 `kern-upgrade.sh` does the whole upgrade. It checks the instance first, takes a snapshot, applies the
 migrations, and confirms every service came back on the new version. If a step fails, it stops and
 prints the command that undoes it.
