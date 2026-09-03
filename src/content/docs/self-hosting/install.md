@@ -75,17 +75,30 @@ migrations and creates the admin user from the email address and password you ga
 
 What the installer does:
 
-1. Creates `~/kern` (override with `KERN_DIR`) and downloads `docker-compose.yml`, `Caddyfile`, `livekit.yaml`, `.env.example` and the Postgres init SQL from the `kern` repository.
+1. Creates `~/kern` (override with `KERN_DIR`) and downloads `docker-compose.yml`, `Caddyfile`,
+   `livekit.yaml`, `.env.example`, the Postgres init SQL, the three scripts — `kern-upgrade.sh`,
+   `kern-rollback.sh`, `kern-backup.sh` — and two systemd user timers from the `app` repository.
 2. Checks that Docker is available, and stops if it is not.
-3. If no `.env` exists yet, copies `.env.example` to `.env` and asks you for:
+3. Reads the [release feed](/developers/releases-and-migrations/#the-release-feed) and pins
+   `KERN_VERSION` to the newest stable release. It never writes `latest`: a rollback records the
+   version it came from, and `latest` is not one.
+4. If no `.env` exists yet, copies `.env.example` to `.env` and asks you for:
    - the **domain or IP** users will open,
    - an **admin email** (used for Let's Encrypt and as the first admin account),
    - an **admin password**.
-   It then generates `KERN_SECRET`, `BETTER_AUTH_SECRET`, `POSTGRES_PASSWORD`, `S3_SECRET_KEY` and LiveKit keys with `openssl rand`, and fills in `KERN_BASE_URL`, `S3_PUBLIC_ENDPOINT` and `MAIL_FROM` for your domain. If the domain is an IP or `localhost`, `ACME_EMAIL` is set to `internal` so Caddy uses its internal CA.
-4. Asks whether to enable the optional **calls** (LiveKit) and **preview** (Gotenberg) profiles, and
-   whether to install the timers that [upgrade](/self-hosting/upgrading/) and
-   [back up](/self-hosting/backups/) the instance on their own.
-5. Runs `docker compose pull` and `docker compose up -d`.
+   It then generates `KERN_SECRET`, `BETTER_AUTH_SECRET`, `POSTGRES_PASSWORD`,
+   `KERN_DB_APP_PASSWORD` (the services connect as a plain role, never as the database superuser),
+   `S3_SECRET_KEY` and the LiveKit keys with `openssl rand`, and fills in `KERN_BASE_URL`,
+   `S3_PUBLIC_ENDPOINT` and `MAIL_FROM` for your domain. If the domain is an IP or `localhost`,
+   `ACME_EMAIL` is set to `internal` so Caddy uses its internal CA.
+5. Asks whether to enable the optional **calls** (LiveKit) and **preview** (Gotenberg) profiles.
+6. Asks whether to install two user timers: one that lets the instance
+   [upgrade itself](/self-hosting/upgrading/) once you switch that on in Admin → Updates, and one
+   that runs [`kern-backup.sh`](/self-hosting/backups/) nightly.
+7. Runs `docker compose pull` and `docker compose up -d`.
+
+The script needs `curl`, `openssl` and `python3` (to read the feed); all three are on a stock
+Ubuntu or Debian server.
 
 ## Manual install
 
@@ -143,6 +156,12 @@ Optional: `livekit` (`--profile calls`), `gotenberg` (`--profile preview`). See 
 cd ~/kern
 docker compose ps                 # status
 docker compose logs -f core       # logs for one service
-docker compose pull && docker compose up -d   # upgrade
+./kern-upgrade.sh --check         # is the instance ready to upgrade, and to what
+./kern-upgrade.sh                 # upgrade to the newest release (snapshot first)
+./kern-rollback.sh                # undo the last upgrade
+./kern-backup.sh                  # back up the database, the files and the configuration
 docker compose down               # stop (data volumes are kept)
 ```
+
+`docker compose pull` on its own upgrades nothing: `KERN_VERSION` is pinned, and only
+`kern-upgrade.sh` moves it. See [Upgrading](/self-hosting/upgrading/).
