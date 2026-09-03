@@ -108,6 +108,52 @@ does not exist yet.
 **Result:** the release appears at [github.com/KernAIO/app/releases](https://github.com/KernAIO/app/releases)
 with `releases.json` attached, and app.kernaio.com reports the version at `/api/health`.
 
+## When the nightly is red
+
+A red `release.yml` or `rollout.yml` opens an issue labelled `release-failure` in the `app`
+repository (or comments on the one already open), which GitHub emails to everyone watching the
+repository. When you finish this procedure the next nightly is green, or the reason it cannot be is
+written in that issue.
+
+1. Open the run the issue links to and read the **step conclusions**, not the run's conclusion:
+
+   ```bash
+   gh run view <run-id> --repo KernAIO/app --json jobs --jq '.jobs[].steps[] | select(.conclusion != "success") | "\(.name): \(.conclusion)"'
+   ```
+
+   **Result:** one or more steps named as `failure` or `skipped`.
+
+2. If the failed step is **the reach** — the message names a module whose peer ranges have not
+   caught up with the framework — republish that module: bump its `peerDependencies` on
+   `@kernhq/contracts` and `@kernhq/kernel` to what is published, `scripts/relock.sh module-<id>`,
+   commit with a changeset, push. The release still went out from `main` as it was; the next
+   nightly picks the module up.
+
+3. If the failed step is **a service's CI on the reach branch**, open that repository's
+   `release/reach` branch run. The fix is in the module the reach moved (a client calling a
+   procedure the server renamed, a mock manifest that still says last week's counts), never in
+   moving the host down.
+
+4. If the failed step is **the pin check** — "core and shell resolve a module differently" —
+   somebody edited a range by hand. Move the one that is behind to the other's version with
+   `node scripts/reach.mjs --write repos/core/package.json repos/shell/package.json`, then
+   `scripts/relock.sh core shell`, commit both, push.
+
+5. If **`rollout.yml`** failed, `app.kernaio.com/api/health` tells you what is live. A rollback
+   already happened if the version is the previous one; if the API answers 503, the instance is in
+   maintenance mode and the run's *Open the API if this run closed it* step says why it could not
+   reopen it — do that by hand on the host with `kern-rollback.sh`, then read the migration dry run
+   in the log for the cause.
+
+6. Dispatch the release again by hand once the cause is fixed, rather than waiting for the next
+   night:
+
+   ```bash
+   gh workflow run release.yml --repo KernAIO/app
+   ```
+
+   **Result:** a green run, a new release, and the issue closed with a comment naming the cause.
+
 ## The release feed
 
 A published release produces a signed `releases.json`, attached to the GitHub release and served
