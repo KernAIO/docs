@@ -51,29 +51,45 @@ Measured on a fresh instance with no traffic:
 So the 4 GB is not for idling. It is the room Postgres uses to cache your data, and the room the
 services use while your team is working.
 
-## One-line install
+## Install
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/KernAIO/app/main/selfhost/install.sh | bash
-```
+Goal: a running Kern at your domain, ready for the first sign-in.
 
-The script is short and readable; you are encouraged to inspect it first. It does the following:
+1. Install Docker with the Compose plugin, if the machine does not have it. Docker's own
+   instructions are at [docs.docker.com/engine/install](https://docs.docker.com/engine/install/).
+
+   **Result:** `docker compose version` prints a version.
+
+2. Download the installer and run it. It asks its questions on the terminal, so it cannot be piped
+   into `bash` — the script refuses that and says so.
+
+   ```bash
+   curl -fsSL https://raw.githubusercontent.com/KernAIO/app/main/selfhost/install.sh -o install.sh
+   bash install.sh
+   ```
+
+   The script is short and readable; you are encouraged to inspect it first.
+
+**Result:** the installer prints the address of your new Kern. The first boot runs the database
+migrations and creates the admin user from the email address and password you gave.
+
+What the installer does:
 
 1. Creates `~/kern` (override with `KERN_DIR`) and downloads `docker-compose.yml`, `Caddyfile`, `livekit.yaml`, `.env.example` and the Postgres init SQL from the `kern` repository.
-2. Checks that Docker is available.
+2. Checks that Docker is available, and stops if it is not.
 3. If no `.env` exists yet, copies `.env.example` to `.env` and asks you for:
    - the **domain or IP** users will open,
    - an **admin email** (used for Let's Encrypt and as the first admin account),
    - an **admin password**.
    It then generates `KERN_SECRET`, `BETTER_AUTH_SECRET`, `POSTGRES_PASSWORD`, `S3_SECRET_KEY` and LiveKit keys with `openssl rand`, and fills in `KERN_BASE_URL`, `S3_PUBLIC_ENDPOINT` and `MAIL_FROM` for your domain. If the domain is an IP or `localhost`, `ACME_EMAIL` is set to `internal` so Caddy uses its internal CA.
-4. Asks whether to enable the optional **calls** (LiveKit) and **preview** (Gotenberg) profiles.
+4. Asks whether to enable the optional **calls** (LiveKit) and **preview** (Gotenberg) profiles, and
+   whether to install the timers that [upgrade](/self-hosting/upgrading/) and
+   [back up](/self-hosting/backups/) the instance on their own.
 5. Runs `docker compose pull` and `docker compose up -d`.
-
-When it finishes it prints the URL to open. The first boot runs database migrations and creates the admin user from `KERN_ADMIN_EMAIL` / `KERN_ADMIN_PASSWORD`.
 
 ## Manual install
 
-If you prefer not to pipe a script into bash:
+If you prefer not to run a script at all:
 
 ```bash
 mkdir -p ~/kern/postgres-init && cd ~/kern

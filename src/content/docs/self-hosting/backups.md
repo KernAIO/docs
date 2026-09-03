@@ -1,50 +1,103 @@
 ---
 title: Backups
-description: What to back up, how, and how to restore.
+description: What to back up, the script that does it, how to restore, and the drill that proves a backup is worth having.
 ---
 
-A Kern instance's state lives in three places. Back up all three.
+A Kern instance's state lives in three places. A backup is all three, taken at the same moment.
 
-| What | Where | How |
+| What | Where | Why it matters |
 |---|---|---|
-| Database (everything except file contents) | `pgdata` volume | `pg_dump` from the `postgres` container |
-| File contents (uploads, attachments, avatars, mail bodies cache) | `miniodata` volume (or your external S3) | `mc mirror`, volume snapshot, or your S3 provider's versioning |
-| Configuration and secrets | `~/kern/.env`, `Caddyfile`, `livekit.yaml`, `caddy_data` (certificates) | copy the files |
+| Database (everything except file contents) | `pgdata` volume | every issue, message, page and person |
+| File contents (uploads, attachments, avatars) | `miniodata` volume, or your external S3 | the bytes the database rows point at |
+| Configuration and secrets | `~/kern/.env`, `Caddyfile`, `livekit.yaml`, `caddy_data` (certificates) | `KERN_SECRET` derives the keys that encrypt stored secrets — **losing `.env` makes those unreadable even with a perfect dump** |
 
-`KERN_SECRET` is used to derive the keys that encrypt stored secrets (SMTP passwords, API keys, IMAP credentials). **Losing `.env` makes those unreadable even with a perfect database dump**, so keep it with your backups.
+NATS and Valkey hold only transient data (event stream retention, cache, presence) and need no backup.
 
-## Database dump
+## The backup script
+
+`kern-backup.sh`, installed beside `docker-compose.yml`, takes all three at once:
 
 ```bash
 cd ~/kern
-docker compose exec -T postgres pg_dump -U kern -Fc kern > kern-$(date +%F).dump
+./kern-backup.sh                 # take a backup into ./backups, prune old ones (14 kept)
+./kern-backup.sh --list          # what you have
+./kern-backup.sh --keep 30       # keep 30
+./kern-backup.sh --to /mnt/nas   # write somewhere other than ./backups
 ```
 
-Restore into a fresh instance:
+**Result:** a dated directory holding `database.dump` (a `pg_dump` custom-format archive),
+`files/` (a mirror of the object storage bucket), `.env` and the compose files, and a
+`RESTORE.txt` that says how to put each back.
+
+The installer offers a timer that runs it nightly. Copy `./backups` off the host — restic, rclone,
+an S3 bucket in another region — because a backup on the disk that fails is not a backup.
+
+This is not the upgrade snapshot. `kern-upgrade.sh` snapshots the database and the compose files
+before every release so `kern-rollback.sh` can undo a bad one in a hurry; it does not copy object
+storage. `kern-backup.sh` is what you restore from when the disk fails rather than when a release
+did. See [Upgrading](/self-hosting/upgrading/).
+
+## Restore
+
+Goal: a working Kern from a backup, on a fresh machine or the same one.
+
+1. Install Docker on the target machine. Put the backup's `.env`, `docker-compose.yml`, `Caddyfile`
+   and `livekit.yaml` into a new directory and download the scripts as the install page shows —
+   but **do not run `install.sh`**: it would generate new secrets, and the ones the dump was
+   written under are in the `.env` you just copied.
+2. Start only the infrastructure, so nothing migrates before the data is back:
+
+   ```bash
+   docker compose up -d postgres minio
+   ```
+
+3. Create the application role, then restore the dump:
+
+   ```bash
+   docker compose up db-init
+   docker compose exec -T postgres pg_restore -U kern -d kern --clean --if-exists < database.dump
+   ```
+
+   **Result:** `pg_restore` exits 0. A warning about an existing extension is normal.
+
+4. Put the files back — `RESTORE.txt` in the backup gives the exact `mc mirror` command for the
+   bundled MinIO, with the bucket name filled in; for an external S3 provider, upload `files/`
+   with that provider's tool.
+5. `docker compose up -d`.
+
+**Result:** the instance answers at its address with the version the dump was taken under, and a
+file uploaded before the backup opens.
+
+## The restore drill
+
+A backup that has never been restored is a hope. Once, and then after any change to how backups
+are taken, restore the newest dump into a scratch database on the same host and compare it with
+what is live:
 
 ```bash
-docker compose up -d postgres
-docker compose exec -T postgres pg_restore -U kern -d kern --clean --if-exists < kern-2026-08-21.dump
-docker compose up -d
+cd ~/kern
+DUMP=$(ls -1t backups/*/database.dump | head -1)
+docker compose exec -T postgres psql -U kern -d postgres -c 'CREATE DATABASE kern_restore'
+docker compose exec -T postgres pg_restore -U kern -d kern_restore --exit-on-error < "$DUMP"
+
+# the row count of every table, in both databases, then the difference
+Q="select n.nspname||'.'||c.relname, (xpath('/row/c/text()', query_to_xml(format('select count(*) as c from %I.%I', n.nspname, c.relname), false, true, '')))[1]::text::bigint from pg_class c join pg_namespace n on n.oid=c.relnamespace where c.relkind='r' and n.nspname like 'mod\_%' order by 1"
+docker compose exec -T postgres psql -U kern -d kern -Atc "$Q" > /tmp/live.txt
+docker compose exec -T postgres psql -U kern -d kern_restore -Atc "$Q" > /tmp/restored.txt
+diff /tmp/live.txt /tmp/restored.txt && echo identical
+
+docker compose exec -T postgres psql -U kern -d postgres -c 'DROP DATABASE kern_restore'
 ```
 
-NATS and Valkey hold only transient data (event stream retention, cache, presence) and do not need backups.
+**Result:** `identical` — or, on a busy instance, differences only in tables written since the dump.
+`pg_restore --exit-on-error` stopping is a backup that would not have saved you; find out why
+before the night it matters.
 
-## Files (MinIO)
-
-Either snapshot the `miniodata` volume while MinIO is stopped, or mirror continuously with the MinIO client:
-
-```bash
-docker run --rm --network kern_default -v $PWD/backup:/backup minio/mc \
-  sh -c "mc alias set local http://minio:9000 kern \$S3_SECRET_KEY && mc mirror local/kern /backup/kern"
-```
-
-If you pointed `S3_ENDPOINT` at an external provider, use that provider's versioning/replication instead.
-
-## Automating
-
-A simple nightly cron job that runs the `pg_dump` above and syncs `~/kern` plus the MinIO mirror to off-host storage (restic, rclone, an S3 bucket in another region) is enough for most teams. Test a restore on a scratch VM at least once — the [install](/self-hosting/install/) flow works fine for that.
+This is the drill Kern Cloud ran on 2026-09-03: 150 tables, identical counts, every restored table
+owned by the application role so row-level security survived the restore.
 
 ## Workspace export
 
-Independently of infrastructure backups, workspace admins can export a workspace's data (JSON + files) from **Workspace settings → Export**. This is meant for migrations between instances, not as a replacement for database backups.
+Independently of infrastructure backups, workspace admins can export a workspace's data (JSON +
+files) from **Workspace settings → Export**. This is meant for migrations between instances, not
+as a replacement for database backups.
