@@ -1,46 +1,80 @@
 ---
 title: Tracker
-description: Issues, projects, workflows, boards, sprints, KQL, reports and time tracking.
+description: Issues and projects — work item types and hierarchy, custom fields, workflows, list and board views, KQL, cycles, triage, the public intake form, time tracking and reports.
 ---
 
-Tracker is Kern's issue and project management module — Jira's depth with Linear's speed. It is the largest module and sets the bar for the rest.
+Tracker is Kern's issue and project module. It is the largest module and the one the others are
+measured against. This page describes what a workspace gets when it switches Tracker on; the
+[module README](https://github.com/KernAIO/module-tracker#readme) describes how it is built.
 
 ## Projects and work items
 
-- **Projects** have a key (`KRN`), lead, members, icon and their own permission scheme. Issues get sequential keys like `KRN-123`.
-- **Work-item types** are arranged in **hierarchy levels** — by default Initiative › Epic › Story / Task / Bug › Sub-task — and are fully customisable per workspace.
-- **Custom fields**: text, number, date, select/multi-select, user, label, URL, checkbox, relation and a light formula field; **field layouts** per type decide what shows where.
+- **Projects** have a key (`KRN`), a lead, members with a role (`admin`, `member`, `viewer`), an
+  icon and a visibility — `workspace`, or `private` for members only. Issues get gapless keys like
+  `KRN-123`.
+- A project is created from a **template** — `software`, `kanban`, `simple` or `blank` — which
+  seeds a workflow, the work item types and four views. An existing project can be saved as a
+  template and new projects created from it.
+- **Work item types** carry a hierarchy level — sub-item, standard, epic, initiative — and each
+  workspace decides its own types, its own hierarchy rules and, per type, which fields show where.
+- **Custom fields**: text, number, date, select and multi-select, user, label, URL, checkbox and
+  relation. Field **layouts** per type decide what the issue form shows.
 
 ## Workflows
 
-Each type uses a workflow: **statuses** with categories (backlog, todo, in progress, done, cancelled, triage), **transitions** (from→to or global), **conditions** (who may transition), **validators** (required fields), **post-functions** (set field, assign, notify, webhook, create sub-item, run automation) and **approvals**. Workflow schemes map types to workflows per project. The same engine powers HR leave, recruiting pipelines and CRM deals.
+Each type follows a workflow: **statuses** with categories (backlog, to do, in progress, done,
+cancelled, triage), **transitions** with **conditions** (who may take them) and **validators**
+(what must be filled in first), and **approvals**. A **visual editor** draws the graph. Workflow
+schemes map types to workflows per project, and every status change records how long the issue
+sat in the previous status, which is what the flow reports are computed from.
+
+Post-functions — set a field, assign, notify, call a webhook when a transition runs — are declared
+in the model and not executed yet.
 
 ## Issues
 
-Title, rich-text description (Tiptap), assignees, reporter, priority, labels, components, versions/releases, estimates (points or time), start/due dates, relations (blocks / duplicates / relates / parent), watchers, threaded comments with reactions, attachments, links, templates, recurring issues, sub-issues, bulk edit. Keyboard-first: single-key shortcuts, ⌘K actions, inline editing. GitHub/GitLab branch and PR links are *v1.x*.
+Title, rich-text description, assignees, reporter, priority, labels (with mutually exclusive
+groups), components, versions, cycle, milestone, parent, estimate, start and due dates, custom
+fields, watchers, **relations** (`blocks`, `relates`, `duplicates`, `clones`), threaded comments
+with reactions, attachments, issue templates, **repeating issues**, sub-issues, bulk edit and
+archiving. Keyboard-first: single-key shortcuts, ⌘K actions, inline editing.
 
-## Views
+## Views and KQL
 
-List, **Board** (scrum/kanban, columns ↔ statuses, WIP limits, swimlanes), Calendar, **Timeline/Gantt** with dependencies, and Spreadsheet. Views are saved queries in **KQL** — a JQL-like language:
+**List** and **board** views (columns are statuses; swimlanes by assignee, priority or label).
+Every view is a saved **KQL** query — a JQL-like language:
 
 ```
 project = KRN AND status IN ("In progress", "In review") AND assignee = me() ORDER BY priority DESC
 ```
 
-A visual filter builder writes KQL for you. Personal views ("My issues", "Triage") and shared views per project.
+A filter builder writes KQL for you. Views are private, shared per project or shared across the
+workspace, and pinning is per person. Calendar, timeline and spreadsheet layouts are declared in
+the contract and not drawn yet.
 
-## Planning and reporting
+## Planning and reports
 
-Backlog ranking, **cycles/sprints** with auto-roll and carry-over, milestones, releases, roadmap. Reports: burndown/burnup, velocity, cumulative flow, created vs resolved, time reports.
+Backlog ranking, **cycles** (starting one snapshots its scope; completing one carries unfinished
+work into the next), milestones, versions and components. Reports: **burndown**, **velocity**,
+**cumulative flow**, **created vs resolved** and **time**.
 
-## Intake, triage, service desk
+## Intake and triage
 
-Triage queue, public forms, **email-to-issue** via the Mail module's intake addresses. Service-desk lite: queues (saved KQL), SLAs with goals and pause conditions, customer/organisation field. A full customer portal is *v1.x*.
+A **public intake form** per project, reachable by token, rate-limited and with a honeypot; what it
+submits lands in the **triage queue**, where it is accepted into the workflow, declined or snoozed.
+
+Email-to-issue is not built: the tracker exposes `issues.createFromEmail` for another module to call,
+and nothing calls it yet. See [Mail](/modules/mail/).
 
 ## Time tracking
 
-Worklogs, timers, estimates vs. logged, timesheets per user/project/week. Approvals are *v1.x*.
+Worklogs against an issue, one running **timer** per person (starting a second stops the first),
+estimate against logged, and the time report.
 
-## Chat integration
+## Import
 
-Any issue can have an opt-in **object channel** in Chat; "Discuss in chat" from the issue, "Convert to issue" from a message.
+CSV, a Jira JSON export or a Linear JSON export, uploaded to Files first and mapped onto a project.
+
+## Chat
+
+Any issue can carry an **object channel** in Chat, so the discussion sits next to the work.

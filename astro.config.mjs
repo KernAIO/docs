@@ -106,12 +106,21 @@ export default defineConfig({
             { label: 'Tracker', slug: 'modules/tracker' },
             { label: 'Chat', slug: 'modules/chat' },
             { label: 'Quire', slug: 'modules/quire' },
-            { label: 'Drive & Calendar', slug: 'modules/docs-drive' },
+            { label: 'Mail', slug: 'modules/mail' },
             { label: 'HR', slug: 'modules/hr' },
+            { label: 'Inventory', slug: 'modules/inventory' },
+          ],
+        },
+        {
+          // Not in a release. Each page opens with a notice saying so; keeping them in their own
+          // group means the Modules list above is the list of what a customer can switch on.
+          label: 'Planned modules',
+          collapsed: true,
+          items: [
+            { label: 'Drive & Calendar', slug: 'modules/docs-drive' },
             { label: 'Recruiting', slug: 'modules/recruiting' },
             { label: 'CRM', slug: 'modules/crm' },
             { label: 'Automation', slug: 'modules/automation' },
-            { label: 'Mail', slug: 'modules/mail' },
             { label: 'Calls', slug: 'modules/calls' },
             { label: 'AI assistant', slug: 'modules/ai' },
           ],
