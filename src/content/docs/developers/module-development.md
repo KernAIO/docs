@@ -1,250 +1,206 @@
 ---
 title: Module development
-description: Build a Kern module — package shape, contract, server, schema, migrations, client — by walking through the template module.
+description: Build a Kern module of your own from the published template, run it inside a local Kern, then build a shell and core image pair that carries it and run that on a self-hosted instance.
 ---
 
-Every feature in Kern is a module, and first-party modules use exactly the same shape you would. The quickest start is to copy `packages/_template` in the [`modules`](https://github.com/KernAIO/modules) repository. This page walks through it file by file.
+Every feature in Kern is a module, and the first-party modules use exactly the shape you will. When
+you finish this page you have a module of your own — contract, server, screens and strings in one
+package — running inside a Kern on your machine, and a pair of container images that carry it to a
+server.
 
 :::note[Your module is yours]
-The template and everything a module imports — `@kernhq/kernel`, `@kernhq/contracts`, `@kernhq/sdk`, `@kernhq/ui` — are Apache-2.0. Licence your module however you like, keep it private, keep it closed, sell it. See [Licensing](/developers/licensing/).
+The template and everything a module imports — `@kernhq/kernel`, `@kernhq/contracts`,
+`@kernhq/sdk`, `@kernhq/ui`, `@kernhq/workflow` — are Apache-2.0. Licence your module however you
+like, keep it private, keep it closed, sell it. See [Licensing](/developers/licensing/).
 :::
 
-## Package shape
+## You need
 
-A module is an npm package named `@kernhq/module-<id>` that exports three entry points (plus its SQL migrations):
+- Node **24** and pnpm **10** (`corepack enable`).
+- Docker with the Compose plugin.
+- A Postgres 18 the module's tests can create databases in. The
+  [dev workspace](/developers/dev-workspace/) starts one with `pnpm infra`.
+- For step 3, the dev workspace itself: `git clone https://github.com/KernAIO/app && cd app && pnpm setup`.
 
-```json title="package.json"
-{
-  "name": "@kernhq/module-template",
-  "type": "module",
-  "files": ["dist", "migrations"],
-  "exports": {
-    "./contract": { "types": "./dist/contract.d.ts", "import": "./dist/contract.js" },
-    "./server": { "types": "./dist/server/index.d.ts", "import": "./dist/server/index.js" },
-    "./client": { "types": "./dist/client/index.d.ts", "svelte": "./dist/client/index.js", "import": "./dist/client/index.js" },
-    "./migrations": "./migrations"
-  },
-  "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run",
-    "db:generate": "drizzle-kit generate"
-  },
-  "dependencies": { "@kernhq/contracts": "^0.1.0", "@kernhq/kernel": "^0.1.0", "@orpc/contract": "^1.15.0", "@orpc/server": "^1.15.0", "drizzle-orm": "^0.45.0", "zod": "^4.1.0" }
-}
-```
+## 1. Start from the template
 
-- `./contract` is imported by **both** server and client (and by other modules): schemas, the oRPC contract, events, permissions. No Node-only code.
-- `./server` is imported by the service that hosts the module.
-- `./client` is imported by the app.
+1. Copy the template into a directory of your own:
 
-## 1. Contract
+   ```bash
+   npx degit KernAIO/module-template module-crm
+   cd module-crm
+   ```
 
-```ts title="src/contract.ts"
-import { baseContract, PageInput, WorkspaceId, page, defineEvent, definePermissions } from '@kernhq/contracts'
-import { z } from 'zod'
+   **Result:** a package with `src/contract.ts`, `src/server/`, `src/client/`, `migrations/` and a
+   `STRUCTURE.md` that says what every directory is for. It is a complete, working module — a `Note`
+   entity with list, create, archive and delete, its own schema, row-level security, permissions,
+   capabilities, events, screens and strings.
 
-export const MODULE_ID = 'template'
-export const Widget = z.object({ id: z.uuid(), workspaceId: WorkspaceId, name: z.string().min(1).max(120), createdAt: z.string() })
-export type Widget = z.infer<typeof Widget>
-const ws = z.object({ workspaceId: WorkspaceId })
+2. Give it its identity. The id must agree in **four places**, and each has been got wrong before:
 
-export const templateContract = {
-  widgets: {
-    list: baseContract.route({ method: 'GET', path: '/widgets', tags: ['template'] }).input(ws.extend(PageInput.shape)).output(page(Widget)),
-    create: baseContract.route({ method: 'POST', path: '/widgets', tags: ['template'] }).input(ws.extend({ name: z.string().min(1) })).output(Widget),
-  },
-}
+   | Where | Change |
+   |---|---|
+   | `package.json` | `name` — `@acme/module-crm` or any name; **delete `"private": true`** or nothing will ever publish |
+   | `src/contract.ts` | `MODULE_ID`, and the prefix of every permission key and event name |
+   | `src/server/schema.ts` | `moduleSchema('crm')` — the Postgres schema becomes `mod_crm` |
+   | `drizzle.config.ts` | `schemaFilter` |
 
-export const templateEvents = {
-  widgetCreated: defineEvent('template.widget.created', z.object({ widgetId: z.uuid(), workspaceId: WorkspaceId })),
-}
-export const templatePermissions = definePermissions([
-  { key: 'template.widget.view', label: 'View widgets', scope: 'workspace', defaultRoles: ['owner', 'admin', 'member', 'guest'], dangerous: false },
-  { key: 'template.widget.manage', label: 'Create/edit widgets', scope: 'workspace', defaultRoles: ['owner', 'admin', 'member'], dangerous: false },
-])
-```
+3. Install and prove the starting point is green:
 
-Conventions:
+   ```bash
+   pnpm install
+   DATABASE_URL=postgres://kern:kern@localhost:5432/kern pnpm typecheck && pnpm lint && pnpm test && pnpm build
+   ```
 
-- **Module id**: lowercase identifier (`/^[a-z][a-z0-9_]*$/`), 2–32 chars. It names the API prefix (`/api/template`), the Postgres schema (`mod_template`), job and event prefixes.
-- **Procedures** take `workspaceId` in the input; `baseContract` carries the shared error vocabulary (`UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `MODULE_DISABLED`, …) and oRPC `route()` metadata produces REST paths and OpenAPI.
-- **Events** are `<module>.<entity>.<action>` with a Zod payload; `defineEvent` validates the name.
-- **Permissions** are `<module>.<resource>.<action>` with label, narrowest scope, default built-in roles and a `dangerous` flag.
+   **Result:** every command exits 0. `src/module.test.ts` walks the contract and the router and
+   fails when a procedure exists in one and not the other, or reaches the database without the
+   workspace gate — keep it.
 
-## 2. Server module
+## 2. Make it yours
 
-```ts title="src/server/index.ts"
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { defineModule, defineServerModule, implement_ } from './_impl.js'
-import { MODULE_ID, templateEvents, templatePermissions } from '../contract.js'
-import { schema } from './schema.js'
+Rename the `Note` entity and grow from there. The template's README and `STRUCTURE.md` are the
+reference; the rules that matter most:
 
-export const templateModule = defineServerModule({
-  definition: defineModule({
-    id: MODULE_ID,
-    name: 'Template',
-    version: '0.1.0',
-    description: 'Example module',
-    icon: 'puzzle',
-    permissions: templatePermissions,
-    events: templateEvents,
-  }),
-  schema,
-  migrationsFolder: join(dirname(fileURLToPath(import.meta.url)), '../../migrations'),
-  router: implement_,
-  subscriptions: {
-    'core.workspace.created': async (e, kernel) => { kernel.log.info({ e: e.name }, 'template saw workspace created') },
-  },
-})
-export default templateModule
-```
+- **Version comes from the package**, never a literal: `packageVersion(import.meta.url)`.
+- **Write the RLS migration by hand.** `pnpm db:generate` emits tables and indexes, never a policy.
+  Copy `migrations/0001_rls.sql` and change the table names; every tenant table carries
+  `workspace_id` and a policy, and the kernel refuses to start in production under a role that
+  bypasses them.
+- **Every migration survives being applied twice.** `drop policy if exists` before every
+  `create policy`, `drop constraint if exists` before every `add constraint`. The kernel migrates
+  every hosted module at boot, so a migration that throws stops the whole service, not your module.
+- **A screen reaches the shell only through `@kernhq/ui`** — `session`, `navigation`, `getHost`,
+  `t`, the formatters, the components. `$app/*`, `$lib/*` and `$msg` are the application's and do
+  not exist in a package built on its own. `pnpm typecheck` here is the only thing that sees that.
+- **Strings ship in `src/client/i18n.ts`.** The platform's locales are `en`, `de`, `fa`, `ar` and
+  `tr`; the starter is English only.
 
-`defineServerModule` accepts, besides `definition`, `schema`, `migrationsFolder` and `router`:
+What the two halves may declare:
 
-| Field | Purpose |
-|---|---|
-| `subscriptions` | event name (or `module.*`) → handler; durable NATS consumers in production |
-| `jobs` | pg-boss job definitions `{ name, schema, handler, options, cron }` — enqueue with `kernel.jobs.send('template.reindex', data)` |
-| `procedures` | callable by other modules/services via `kernel.call('template.<name>', input)` |
-| `automations` | triggers / conditions / actions registered with the Automation module |
-| `search` | indexers per object type; `resolvers` render object references (title, url, icon) |
-| `onBoot`, `onWorkspaceEnabled`, `onWorkspaceDisabled`, `onShutdown` | lifecycle hooks |
+- The **server** — tables, migrations, a router, `procedures` other modules call through
+  `kernel.call()`, `jobs`, `subscriptions`, search indexers, object resolvers, `httpRoutes` for a
+  webhook that needs the raw body, and lifecycle hooks.
+- The **client** — `nav`, `routes`, `commands`, `settingsPages`, `widgets` for the dashboard,
+  `sidebar` for the column beside the rail, `presenters` for rendering your objects inside somebody
+  else's screen, and `messages`.
 
-The definition can also declare `dependsOn`, `defaultHost` (`core` by default), `notificationTypes`, `objectTypes` (for mentions/links/object channels) and a `settings` Zod schema that becomes the workspace settings form.
+Both entry points export the module as their **default export**. That is what the next two steps
+rely on.
 
-## 3. Schema and migrations
+## 3. Run it inside a local Kern
 
-```ts title="src/server/schema.ts"
-import { moduleSchema } from '@kernhq/kernel'
-import { index, text, timestamp, uuid } from 'drizzle-orm/pg-core'
-import { sql } from 'drizzle-orm'
+The umbrella workspace links any package under `repos/`, and the two host images take a list of
+extra modules — the same mechanism the images use in step 4, so nothing is forked.
 
-export const schema = moduleSchema('template')          // pgSchema('mod_template')
-export const widgets = schema.table(
-  'widgets',
-  {
-    id: uuid('id').primaryKey().default(sql`uuidv7()`),
-    workspaceId: uuid('workspace_id').notNull(),
-    name: text('name').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  },
-  (t) => [index('widgets_ws_idx').on(t.workspaceId, t.createdAt)],
-)
-```
+1. Put your module where the workspace sees it, and link it:
 
-Rules:
+   ```bash
+   mv ../module-crm repos/module-crm          # inside the app checkout
+   ```
 
-- Every table lives in **`mod_<id>`** — the kernel creates the schema and applies `migrations/` into it (bookkeeping table `__migrations` inside the same schema).
-- Every tenant table has `workspace_id` and a composite index starting with it.
-- Add **row-level security** to generated migrations with the helper:
+   Add `"@acme/module-crm": "workspace:*"` to `dependencies` in **both** `repos/core/package.json`
+   and `repos/shell/package.json`, then:
 
-```ts
-import { rlsPolicySql } from '@kernhq/kernel'
-// emits: enable/force RLS + policy using current_setting('app.workspace_id')
-rlsPolicySql('mod_template', 'widgets')
-```
+   ```bash
+   scripts/pnpm-install-locked.sh
+   ```
 
-Queries run inside `kernel.database.withWorkspace(workspaceId, tx => …)`, which sets `app.workspace_id` (and `app.user_id`) for the transaction.
+   **Result:** `readlink repos/shell/node_modules/@acme/module-crm` prints a path under `repos/`.
 
-Generate migrations with `pnpm db:generate` (`drizzle.config.ts` filters to `mod_template`).
+   `core` reads your package's `./server` and `./contract` from its **`dist/`**, so run
+   `pnpm build` in the module after every server change; the shell reads `./client` as source and
+   sees an edit immediately.
 
-## 4. Router implementation
+2. Generate the wiring in both hosts:
 
-```ts title="src/server/_impl.ts"
-import { type Kernel, defineModule, defineServerModule, workspaceScoped, requires, uuidv7 } from '@kernhq/kernel'
-import { implement } from '@orpc/server'
-import { desc, eq } from 'drizzle-orm'
-import { MODULE_ID, templateContract, templateEvents } from '../contract.js'
-import { widgets } from './schema.js'
+   ```bash
+   (cd repos/core  && KERN_EXTRA_MODULES=@acme/module-crm node scripts/extra-modules.mjs)
+   (cd repos/shell && KERN_EXTRA_MODULES=@acme/module-crm node scripts/extra-modules.mjs)
+   ```
 
-const os = implement(templateContract).$context<import('@kernhq/kernel').RequestContext>()
+   **Result:** each prints `extra-modules: @acme/module-crm`. `repos/core/src/extra-modules.ts`
+   and `repos/shell/src/lib/modules/extra.ts` now import your package. Do not commit those two
+   files; running the script with the variable empty writes them back.
 
-export function implement_(kernel: Kernel) {
-  const scoped = os.use(workspaceScoped(MODULE_ID))      // membership + "module enabled" check
-  return os.router({
-    widgets: {
-      list: scoped.widgets.list.use(requires('template.widget.view')).handler(async ({ input }) =>
-        kernel.database.withWorkspace(input.workspaceId, async (tx) => {
-          const rows = await tx.select().from(widgets).where(eq(widgets.workspaceId, input.workspaceId)).orderBy(desc(widgets.createdAt)).limit(input.limit)
-          return { items: rows.map((r) => ({ ...r, createdAt: r.createdAt.toISOString() })), nextCursor: null }
-        }),
-      ),
-      create: scoped.widgets.create.use(requires('template.widget.manage')).handler(async ({ input, context }) => {
-        const row = await kernel.database.withWorkspace(input.workspaceId, async (tx) => {
-          const [r] = await tx.insert(widgets).values({ id: uuidv7(), workspaceId: input.workspaceId, name: input.name }).returning()
-          return r!
-        })
-        await kernel.emit(templateEvents.widgetCreated, { widgetId: row.id, workspaceId: input.workspaceId }, { workspaceId: input.workspaceId, actorId: context.principal.userId })
-        await kernel.realtime.change(input.workspaceId, { module: MODULE_ID, entity: 'widget', id: row.id, op: 'created' })
-        return { ...row, createdAt: row.createdAt.toISOString() }
-      }),
-    },
-  })
-}
-```
+3. Start everything:
 
-Middleware from `@kernhq/kernel`: `authed` (any authenticated principal), `workspaceScoped(moduleId)` (active membership + module enabled → sets `context.workspaceId`), `requires(permission)` (workspace-scope permission). For object/project scope call `kernel.authz.require(principal, key, { kind: 'project', id, workspaceId, parents })` directly.
+   ```bash
+   pnpm infra && pnpm dev
+   ```
 
-After a mutation: **emit an event** (activity, automation, webhooks, other modules) and **publish a realtime change** (clients invalidate their caches).
+   **Result:** `curl -s localhost:4000/api/health` lists `crm` among the modules, and
+   `/api/crm/openapi.json` describes your router.
 
-## 5. Client module
+4. Open http://localhost:5173, sign in, and switch the module on in **Settings → Modules**.
 
-```ts title="src/client/index.ts"
-import { defineClientModule } from '@kernhq/kernel/client'
-export const templateClient = defineClientModule({
-  id: 'template',
-  name: 'Template',
-  icon: 'puzzle',
-  nav: [{ id: 'template', label: 'Widgets', icon: 'puzzle', href: '/template', permission: 'template.widget.view' }],
-})
-export default templateClient
-```
+   **Result:** your navigation entry appears in the rail, your settings pages under Settings, your
+   widgets in the dashboard's *add widget* list, and your strings in whichever language the
+   workspace uses.
 
-A client module can contribute `routes` (under `/(app)/[workspace]/<module>`), `nav`, `commands` (⌘K actions), `presenters` (how an object renders inline / as a card), `slots` (sidebar widgets, right-panel tabs, settings pages, notification renderers, chat message actions…), `shortcuts`, `notifications`, `settingsPages` and `messages` (i18n bundles). Components are Svelte 5 and loaded lazily.
+A module that has never served a request is not finished, whatever the type-checker says.
 
-## 6. Dashboard widgets
+## 4. Build the images that carry it
 
-A module can put cards on the workspace home page by declaring `widgets`. The shell draws the frame
-— card, header, drag handle, menu, and the loading, empty and error states — so a widget component
-writes only a body.
+A self-hosted instance runs the two images Kern publishes — `ghcr.io/kernaio/shell` and
+`ghcr.io/kernaio/core` — and a module has to be *inside* them: modules are composed at build time
+(see [ADR 0002](https://github.com/KernAIO/app/blob/main/docs/adr/0002-platform-versioning-and-updates.md)).
+Both Dockerfiles take `KERN_EXTRA_MODULES`, a space-separated list of npm package specs, install
+them, and generate the same two files as step 3.
 
-```ts title="src/client/index.ts"
-widgets: [
-  {
-    id: 'template.recent',            // `<module>.<widget>`; stored in saved layouts, so never rename
-    get title() { return m.template_recent_title() },
-    get description() { return m.template_recent_desc() },
-    icon: 'puzzle',
-    permission: 'template.note.view',
-    sizes: ['m', 'l'],                // only sizes you have actually looked at
-    defaultSize: 'm',
-    settings: [
-      { kind: 'number', key: 'limit', label: 'Rows', default: 6, min: 3, max: 20 },
-    ],
-    component: () => import('./widgets/RecentWidget.svelte'),
-  },
-]
-```
+1. Publish the module to a registry the build can reach — `pnpm publish` to npm, or a registry your
+   build context's `.npmrc` points at.
 
-The component receives `WidgetProps`: `instanceId`, `workspaceId`, `workspaceSlug`, the resolved
-`settings`, `size`, `span`, `columns`, `editing`, and a `configure()` callback.
+2. Build **both** images from the same Kern release tag, with the same list. A shell that knows a
+   module its core does not have calls procedures nobody serves:
 
-Three rules decide whether a widget is any good:
+   ```bash
+   KERN=v0.2.1
+   MODS="@acme/module-crm@1.2.0"
+   docker build --build-arg KERN_VERSION=${KERN#v} --build-arg KERN_EXTRA_MODULES="$MODS" \
+     -t registry.example.com/acme/kern-core:${KERN#v}  https://github.com/KernAIO/core.git#$KERN
+   docker build --build-arg KERN_VERSION=${KERN#v} --build-arg KERN_EXTRA_MODULES="$MODS" \
+     -t registry.example.com/acme/kern-shell:${KERN#v} https://github.com/KernAIO/shell.git#$KERN
+   ```
 
-- **Name the procedure before designing the card.** A widget shows data that already exists. If
-  nothing returns the number you want, add the procedure or drop the widget — do not approximate it.
-- **Put the settings in the query key.** `queryKey: [module, entity, workspaceId, settingsScope(settings)]`.
-  Without it the cached result is served and the setting appears to do nothing.
-- **Hide row actions while `editing` is true.** Somebody rearranging the board is not acting on it.
+   **Result:** the build log shows `extra-modules: @acme/module-crm` in each. A package the build
+   cannot find fails the build there, by name, rather than producing an image without it.
 
-A widget declaring a single number sets `compact: true` and draws no header of its own.
+3. Push both images to your registry.
 
-## 7. Hosting the module
+## 5. Run them on a self-hosted instance
 
-Add the package to the host service's static registry (e.g. `core`'s `kern.modules.ts`) and to the app's module list. The kernel applies migrations, mounts `/api/template` (+ `/api/template/openapi.json`), registers procedures, jobs and subscriptions at start-up. Per-workspace enablement is handled by core — nothing to do in the module.
+1. In the instance's `.env`, point the two image variables at your registry and pin the version the
+   pair was built from:
+
+   ```dotenv
+   KERN_IMAGE_CORE=registry.example.com/acme/kern-core
+   KERN_IMAGE_SHELL=registry.example.com/acme/kern-shell
+   KERN_VERSION=0.2.1
+   ```
+
+2. Pull and restart:
+
+   ```bash
+   docker compose pull && docker compose up -d
+   ```
+
+   **Result:** `curl -s https://kern.example.com/api/health` lists your module, and it appears in
+   **Admin → Modules** with the version your package declares.
+
+Two things follow from carrying your own images:
+
+- **Every Kern release needs a rebuild of the pair** before `KERN_VERSION` moves. The updater will
+  not do it for you — leave *Admin → Updates* on *notify* rather than *auto*, rebuild when a release
+  arrives, then upgrade.
+- **`KERN_VERSION` is still the version of Kern**, baked into the image at build time. Your module's
+  own version is what `/api/health` and Admin → Modules show beside its id.
 
 ## Testing
 
-Unit-test contract logic with Vitest. For integration, boot `createKernel({ service: 'test', modules: [templateModule] })` against the dev Postgres; stub core procedures by registering them locally: `kernel.broker.register('core', { 'users.principal': { handler: async () => testPrincipal() } })`. `@kernhq/kernel/testing` exports `InMemoryEventBus` and `testPrincipal()`.
+Unit-test contract logic with Vitest. For integration, boot the kernel against a scratch database —
+`createKernel({ service: 'test', modules: [crmModule] })` — and stub the core procedures your module
+calls by registering them locally:
+`kernel.broker.register('core', { 'users.principal': { handler: async () => testPrincipal() } })`.
+`@kernhq/testing` carries `permissionMatrixDiff`, which the first-party modules use to pin which
+built-in role holds each permission, and the tracker's `src/server/isolation.test.ts` is the shape
+of a cross-tenant test worth copying.

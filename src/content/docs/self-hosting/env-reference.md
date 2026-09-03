@@ -18,6 +18,8 @@ description: Every variable in the self-host .env file and what it controls.
 | Variable | Default | Purpose |
 |---|---|---|
 | `KERN_VERSION` | `latest` | Image tag for all `ghcr.io/kernaio/*` services. Pin to a version to control upgrades. This selects the image only — the version a container reports is baked into the image, so the two cannot drift. |
+| `KERN_IMAGE_SHELL` | `ghcr.io/kernaio/shell` | The shell image, without its tag. Point it at your own registry when you have built the image with modules of your own — see [Module development](/developers/module-development/). |
+| `KERN_IMAGE_CORE` | `ghcr.io/kernaio/core` | The core image, without its tag; `core` and `core-worker` both run it. Build it from the same release and with the same modules as the shell. |
 | `KERN_UPDATE_FEED_KEY` | built in | Base64 ed25519 public key the release feed is verified with. Set this only when you publish your own feed. |
 | `KERN_SNAPSHOT_DIR` | `./snapshots` | Where `kern-upgrade.sh` writes its pre-upgrade snapshots. |
 | `KERN_KEEP_SNAPSHOTS` | `5` | How many snapshots to keep. |
