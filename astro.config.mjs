@@ -83,6 +83,7 @@ export default defineConfig({
             { label: 'Install on Coolify', slug: 'self-hosting/coolify' },
             { label: 'Compose profiles', slug: 'self-hosting/compose-profiles' },
             { label: 'Reverse proxy & TLS', slug: 'self-hosting/reverse-proxy-tls' },
+            { label: 'External Postgres', slug: 'self-hosting/external-postgres' },
             { label: 'Upgrading', slug: 'self-hosting/upgrading' },
             { label: 'Backups', slug: 'self-hosting/backups' },
             { label: 'Billing', slug: 'self-hosting/billing' },
@@ -96,6 +97,7 @@ export default defineConfig({
             { label: 'Workspaces', slug: 'administration/workspaces' },
             { label: 'Roles & permissions', slug: 'administration/roles-permissions' },
             { label: 'Modules', slug: 'administration/modules' },
+            { label: 'Connect AI clients (MCP)', slug: 'administration/mcp' },
           ],
         },
         {
