@@ -82,7 +82,8 @@ Under **What it includes**, set the limits. **An empty field means unlimited.**
 - **Seats** — members who are not guests. Guests never consume a seat.
 - **Storage (GB)** — total size of the workspace's files.
 - **Audit log kept (days)** — how long audit entries survive.
-- **Single sign-on** — whether the workspace may register an identity provider.
+- **Single sign-on** — reserved for the release that ships identity providers; registering one is
+  not available yet, so leave it off and promise nothing on the plan's highlights.
 
 Select **Save**, then publish the plan from its row menu.
 

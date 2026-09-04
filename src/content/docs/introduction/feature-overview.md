@@ -7,7 +7,7 @@ This page condenses the v1.0 scope. Each module has its own page under **Modules
 
 ## Platform (always on)
 
-- **Accounts**: email + password, magic link, Google/GitHub/Microsoft OAuth, 2FA and passkeys, multi-device sessions, per-workspace SSO (OIDC/SAML), API tokens and service accounts. SCIM is *v1.x*.
+- **Accounts**: email + password, magic link, Google/GitHub/Microsoft OAuth, 2FA and passkeys, multi-device sessions, API tokens and service accounts. Per-workspace SSO (OIDC/SAML) and SCIM are not in this release.
 - **Workspaces**: unlimited per instance; members, groups, custom roles, invitations (by email or from shared workspaces), join requests, domain auto-join, ownership transfer, archive/delete, branding, encrypted integrations, module toggles, audit log, export/import.
 - **Permissions**: module-registered keys, roles, bindings at workspace/project/space/object scope, per-project permission schemes, restricted guests.
 - **Notifications**: cross-workspace inbox, per-type channel preferences, mention/assign/watch rules, digests, Web Push (including iOS declarative push), badge counts.

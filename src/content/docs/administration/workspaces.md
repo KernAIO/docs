@@ -36,7 +36,7 @@ Other ways in:
 - **General** — name, slug, branding, locale.
 - **Members, Roles, Groups** — as above.
 - **Modules** — enable/disable modules for this workspace; see [Modules](/administration/modules/).
-- **Integrations** — outbound mail provider, AI provider key, LiveKit (if not instance-wide), SSO (OIDC/SAML). Secrets are encrypted at rest with keys derived from `KERN_SECRET` and are never returned in full by the API.
+- **Integrations** — outbound mail provider. Secrets are encrypted at rest with keys derived from `KERN_SECRET` and are never returned in full by the API.
 - **Webhooks & API** — outgoing webhooks (signed), incoming webhook endpoints, workspace-scoped API tokens.
 - **Audit log** — who changed what in the workspace (members, roles, settings, module toggles).
 - **Import / Export** — importers (Jira, Linear, CSV) and a full workspace export.

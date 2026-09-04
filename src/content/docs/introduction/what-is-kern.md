@@ -27,7 +27,7 @@ Everything is **multi-workspace**: an instance hosts any number of workspaces (c
 
 ## Self-host vs Kern Cloud
 
-Self-hosting is free and complete — there is no "enterprise tier" of hidden features. Items that other tools sell (custom types, time tracking, approvals, automations, RBAC, audit logs, SSO) ship in the open-source release. A hosted version, **Kern Cloud**, is the commercial offering for teams that prefer not to run servers.
+Self-hosting is free and complete — there is no "enterprise tier" of hidden features. Items that other tools sell (custom types, time tracking, approvals, RBAC, audit logs) ship in the open-source release. A hosted version, **Kern Cloud**, is the commercial offering for teams that prefer not to run servers.
 
 ## Technology in one paragraph
 

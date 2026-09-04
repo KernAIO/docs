@@ -11,7 +11,7 @@ An **instance** is one Kern installation: one domain, one database, one set of u
 
 ## Users and accounts
 
-Identity is **global to the instance**. A user signs up once (email + password, magic link, Google/GitHub/Microsoft, passkeys, or SSO) and can be a member of many workspaces. Personal settings — locale, theme, notification preferences, API tokens — belong to the user, not to a workspace.
+Identity is **global to the instance**. A user signs up once (email + password, magic link, Google/GitHub/Microsoft, or passkeys) and can be a member of many workspaces. Personal settings — locale, theme, notification preferences, API tokens — belong to the user, not to a workspace.
 
 ## Workspaces
 
