@@ -3,8 +3,6 @@ title: Connect AI clients (MCP)
 description: Let people use Kern from Claude, Cursor or another AI client — what an admin switches on, what a user consents to, and how to disconnect an app again.
 ---
 
-Connect AI clients (MCP)
-
 Kern speaks the Model Context Protocol (MCP). When MCP is switched on for a workspace, members can
 connect tools like Claude or Cursor and work with their projects, mail and documents through them.
 
@@ -31,6 +29,28 @@ back on.
 
 Members also need `core.integrations.manage` to see the connected-apps list. Regular members do not
 need any extra permission to connect their own AI client.
+
+### If step 6 renders a web page instead
+
+A `200` and Kern's own interface means the proxy is not routing MCP to `core`. Core serves `/mcp`
+and the two OAuth discovery documents at the **root** of its app — the MCP and RFC 8414/9728
+specifications fix those paths, so they cannot move under `/api` — and a proxy that routes only
+`/api/*` sends them to the web app. Every stack shipped before 2026-09-05 did exactly that, so MCP
+answered HTML on every self-host install, and an AI client reads that as a malformed discovery
+document and gives up.
+
+Bring the routes in on an existing instance:
+
+```bash
+cd ~/kern
+./kern-upgrade.sh --stack-files
+docker compose up -d caddy
+```
+
+**Result:** `curl -s -o /dev/null -w '%{http_code}\n' https://<your-domain>/mcp` prints `405`.
+
+If the upgrade reports that it left your `Caddyfile` alone, you have edited it — merge the release's
+diff by hand; see [Reverse proxy & TLS](/self-hosting/reverse-proxy-tls/#mcp-is-served-from-the-root-not-from-api).
 
 ## What a member does
 
@@ -73,5 +93,11 @@ missing endpoint — nothing is deleted, and turning MCP back on restores them.
 ## For developers
 
 Tools come from each module's OpenAPI document — the same one at `/api/<module>/openapi.json`.
-Operation summaries become tool descriptions. See ADR 0011 (`docs/adr/0011-mcp-and-the-api-as-tools.md`
-in the umbrella repository) for why the API surface and the tool surface are the same surface.
+Operation summaries become tool descriptions, so a module needs no MCP code and cannot expose a tool
+its API does not already expose: the tool surface *is* the API surface, and every call goes back
+through the same permission check, module gate and workspace scope an HTTP request does.
+
+The workspace is not something the model chooses. It comes from the token the member approved, and
+core writes it into the request itself — into `{workspaceId}` where the route has one, and into the
+query string where it does not. See [API & OpenAPI](/developers/api-openapi/) for the surface both
+share.
