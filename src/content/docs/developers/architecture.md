@@ -21,10 +21,10 @@ Kern is a small set of Node services sharing one Postgres, one event bus and one
 
 | Service | Hosts | Why separate |
 |---|---|---|
-| `app` | SvelteKit PWA; every module's client part | static/SSR web tier |
-| `core` | identity (Better Auth), workspaces, members, roles/permissions, notifications, settings, files, search, webhooks, importers **and** the modules tracker, hr, recruit, crm, time, calendar, automation, docs (meta), drive (meta), ai, calls; `core-worker` runs pg-boss jobs | the default home for modules |
+| `app` | SvelteKit PWA; every module's client part. Built from the `shell` repository. | static/SSR web tier |
+| `core` | identity (Better Auth), workspaces, members, roles/permissions, notifications, settings, files, search, MCP **and** the modules `tracker`, `quire`, `hr`, `billing`, `inventory`; `core-worker` runs pg-boss jobs | the default home for modules |
 | `chat` | chat module + the realtime WebSocket gateway for all modules | persistent connections, different scaling |
-| `mail` | mail module: providers, templates, queue, webhooks, IMAP IDLE sync, intake | long-lived IMAP connections, crash isolation |
+| `mail` | mail module: providers, templates, the send queue, provider webhooks | crash isolation; a stuck provider must not take core down |
 | `collab` | Hocuspocus (Yjs) server, persisted to Postgres | CRDT WebSockets, CPU profile |
 
 Moving a module from one service to another is configuration: the kernel routes calls and events transparently.
@@ -58,8 +58,9 @@ Moving a module from one service to another is configuration: the kernel routes 
 - Every tenant table has `workspace_id` (uuidv7 keys) and **row-level security** keyed on `SET LOCAL app.workspace_id` as defence in depth; composite indexes start with `workspace_id`.
 - Global (non-RLS) tables: users, sessions, workspaces, memberships, notifications, push subscriptions, API keys.
 - Custom fields: metadata tables + JSONB `custom` columns with expression indexes; KQL compiles to SQL over both.
-- **Activity log** (`activity_events`, partitioned monthly) is the source for history, feeds, automation, webhooks and search indexing (outbox pattern).
-- Extensions: pgvector, pg_trgm, ltree, pg_partman. Jobs: pg-boss. Cache/presence/rate-limit: Valkey. Bus: NATS JetStream (`kern.<ws>.<module>.<event>`, request/reply on `kern.rpc.*`, KV for presence). Files: MinIO/S3 with tus uploads.
+- **Activity log** (`mod_core.activity_events`) is the source for history, feeds and search indexing (outbox pattern). It is a plain table, not partitioned.
+- Extensions, created by `db-init` before any service starts: `vector`, `pg_trgm`, `ltree`, `pgcrypto`, `btree_gist`, and `pg_stat_statements` where the server has it. Jobs: pg-boss. Cache/presence/rate-limit: Valkey. Bus: NATS JetStream (`kern.<ws>.<module>.<event>`, request/reply on `kern.rpc.*`, KV for presence). Files: MinIO/S3, one presigned PUT per file — resumable (tus) uploads are not built.
+- **The services connect as `kern_app`, never as the Postgres superuser.** A superuser bypasses row-level security unconditionally, so every policy above would be inert. `db-init` creates the role `NOSUPERUSER NOBYPASSRLS` and hands it ownership of the database.
 
 ## Auth
 

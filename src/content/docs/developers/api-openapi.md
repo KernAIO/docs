@@ -61,7 +61,16 @@ List endpoints accept `cursor` and `limit` (1–200, default 50) and return `{ i
 
 ## Webhooks
 
-Outgoing webhooks (configured per workspace) are signed with an HMAC header; incoming webhook endpoints are provided by modules (Automation triggers, Mail provider callbacks under `/api/mail/webhooks/<provider>`).
+**Outgoing webhooks are not built** — nothing in Kern calls out to a URL you register.
+
+Two modules accept an **incoming** one, and each authenticates it in its own way because neither
+caller can present a Kern session:
+
+| Endpoint | Who posts to it | How it is authenticated |
+|---|---|---|
+| `POST /api/chat/webhooks/{token}` | anything you want to post into a channel | the token in the path, which is bound to one channel |
+| `POST /api/mail/webhooks/{provider}` | Mailgun, Postmark, SES or Resend | `?token=` or `x-kern-webhook-token`, matched against `MAIL_WEBHOOK_TOKEN`; SES events are also SNS-signature checked |
+| `POST /api/billing/webhook` | Stripe | the Stripe signature, against `STRIPE_WEBHOOK_SECRET` |
 
 ## Generating clients
 
