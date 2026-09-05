@@ -14,7 +14,7 @@ Kern ships as a set of Docker images plus a `docker compose` file, a Caddy rever
 | CPU | 2 vCPU | 4 vCPU |
 | RAM | 4 GB | 8 GB |
 | Disk | 20 GB | 40 GB |
-| Suits | a team of about twenty, running issues, chat, docs and mail | calls and office previews switched on, mail syncing several accounts, or more than fifty people |
+| Suits | a team of about twenty, running issues, chat, the wiki and mail | office previews switched on, heavy document collaboration, or more than fifty people |
 
 The minimum is the smallest tier at most hosts. Disk is about 1.5 GB of images plus your database
 and your files — what people upload decides the real number.
@@ -27,7 +27,7 @@ and your files — what people upload decides the real number.
   needs images built for it.
 - A **domain name** pointing at the host, for automatic HTTPS. An IP address works for a machine on
   your network; Caddy then issues a self-signed certificate.
-- Ports **80** and **443** open. Calls add **7881/tcp** and **50000–50200/udp**.
+- Ports **80** and **443** open. Nothing else.
 - No outbound access, once the images are pulled. An instance with no route to the internet runs the
   same — it only loses the update check.
 
@@ -60,15 +60,26 @@ Goal: a running Kern at your domain, ready for the first sign-in.
 
    **Result:** `docker compose version` prints a version.
 
-2. Download the installer and run it. It asks its questions on the terminal, so it cannot be piped
-   into `bash` — the script refuses that and says so.
+2. Run the installer:
+
+   ```bash
+   curl -fsSL https://get.kernaio.com | bash
+   ```
+
+   It asks for a domain, an admin email and an admin password.
+
+   Piping into `bash` is supported. The installer reads every answer from `/dev/tty` rather than
+   from its standard input, so the pipe carrying the script cannot answer its own questions. If
+   there is no terminal at all — a CI job, `ssh host 'curl … | bash'` — it changes nothing and stops
+   with instructions.
+
+   To read the script before running it, download it instead. It is short and has no hidden steps:
 
    ```bash
    curl -fsSL https://raw.githubusercontent.com/KernAIO/app/main/selfhost/install.sh -o install.sh
+   less install.sh
    bash install.sh
    ```
-
-   The script is short and readable; you are encouraged to inspect it first.
 
 **Result:** the installer prints the address of your new Kern. The first boot runs the database
 migrations and creates the admin user from the email address and password you gave.
@@ -77,28 +88,37 @@ What the installer does:
 
 1. Creates `~/kern` (override with `KERN_DIR`) and downloads `docker-compose.yml`, `Caddyfile`,
    `livekit.yaml`, `.env.example`, the Postgres init SQL, the three scripts — `kern-upgrade.sh`,
-   `kern-rollback.sh`, `kern-backup.sh` — and two systemd user timers from the `app` repository.
+   `kern-rollback.sh`, `kern-backup.sh` — and four systemd user units from the `app` repository. A
+   file that is already there is left alone.
 2. Checks that Docker is available, and stops if it is not.
 3. Reads the [release feed](/developers/releases-and-migrations/#the-release-feed) and pins
    `KERN_VERSION` to the newest stable release. It never writes `latest`: a rollback records the
    version it came from, and `latest` is not one.
 4. If no `.env` exists yet, copies `.env.example` to `.env` and asks you for:
    - the **domain or IP** users will open,
-   - an **admin email** (used for Let's Encrypt and as the first admin account),
+   - an **admin email**, used for Let's Encrypt and as the first admin account,
    - an **admin password**.
+
    It then generates `KERN_SECRET`, `BETTER_AUTH_SECRET`, `POSTGRES_PASSWORD`,
-   `KERN_DB_APP_PASSWORD` (the services connect as a plain role, never as the database superuser),
-   `S3_SECRET_KEY` and the LiveKit keys with `openssl rand`, and fills in `KERN_BASE_URL`,
+   `KERN_DB_APP_PASSWORD` and `S3_SECRET_KEY` with `openssl rand`, and `MAIL_WEBHOOK_TOKEN`, which
+   provider bounce webhooks must present. It fills in `KERN_BASE_URL`, `KERN_DIR`,
    `S3_PUBLIC_ENDPOINT` and `MAIL_FROM` for your domain. If the domain is an IP or `localhost`,
    `ACME_EMAIL` is set to `internal` so Caddy uses its internal CA.
-5. Asks whether to enable the optional **calls** (LiveKit) and **preview** (Gotenberg) profiles.
-6. Asks whether to install two user timers: one that lets the instance
-   [upgrade itself](/self-hosting/upgrading/) once you switch that on in Admin → Updates, and one
-   that runs [`kern-backup.sh`](/self-hosting/backups/) nightly.
-7. Runs `docker compose pull` and `docker compose up -d`.
+5. If `.env` already exists, it changes nothing except to fill in `KERN_DIR`,
+   `KERN_DB_APP_PASSWORD` and `MAIL_WEBHOOK_TOKEN` when they are missing.
+6. Asks which optional [Compose profiles](/self-hosting/compose-profiles/) to start.
+7. Asks whether to install two user timers: one that lets the instance
+   [upgrade itself](/self-hosting/upgrading/) once you switch that on in **Admin → Updates**, and
+   one that runs [`kern-backup.sh`](/self-hosting/backups/) nightly.
+8. Runs `docker compose pull` and `docker compose up -d`.
 
 The script needs `curl`, `openssl` and `python3` (to read the feed); all three are on a stock
 Ubuntu or Debian server.
+
+Two things it deliberately does **not** do. It never connects to the database as the Postgres
+superuser: `db-init` creates `kern_app` as `NOSUPERUSER NOBYPASSRLS`, which is what makes every
+module's row-level security apply. And it never overwrites a value already in `.env`, so anything you
+have set by hand survives a re-run and every upgrade.
 
 ## Manual install
 
@@ -107,13 +127,40 @@ If you prefer not to run a script at all:
 ```bash
 mkdir -p ~/kern/postgres-init && cd ~/kern
 RAW=https://raw.githubusercontent.com/KernAIO/app/main/selfhost
-for f in docker-compose.yml Caddyfile livekit.yaml .env.example postgres-init/01-extensions.sql; do
+for f in docker-compose.yml Caddyfile livekit.yaml .env.example postgres-init/01-extensions.sql \
+         kern-upgrade.sh kern-rollback.sh kern-backup.sh; do
   curl -fsSL "$RAW/$f" -o "$f"
 done
+chmod +x kern-upgrade.sh kern-rollback.sh kern-backup.sh
 cp .env.example .env
-# edit .env: KERN_DOMAIN, KERN_BASE_URL, ACME_EMAIL, secrets (openssl rand -hex 32), admin credentials
+chmod 600 .env
+```
+
+Then edit `.env`. These are the fields with no usable default:
+
+| Field | Set it to |
+|---|---|
+| `KERN_DOMAIN` | the host name users open, for example `kern.example.com` |
+| `KERN_BASE_URL` | `https://` plus that host name |
+| `ACME_EMAIL` | your email, or `internal` for an IP or LAN install |
+| `KERN_VERSION` | a release number from [the releases page](https://github.com/KernAIO/app/releases). **Not `latest`** — a rollback records the version you came from, and `latest` is not one. |
+| `KERN_DIR` | the absolute path of this directory |
+| `S3_PUBLIC_ENDPOINT` | the same value as `KERN_BASE_URL`. A bare origin with **no path**. |
+| `MAIL_FROM` | a sender address on your domain |
+| `KERN_ADMIN_EMAIL`, `KERN_ADMIN_PASSWORD` | the first instance admin |
+| `KERN_SECRET`, `BETTER_AUTH_SECRET`, `POSTGRES_PASSWORD`, `KERN_DB_APP_PASSWORD`, `S3_SECRET_KEY`, `MAIL_WEBHOOK_TOKEN` | a fresh `openssl rand -hex 32` each |
+
+Leave `KERN_SIGNUP` commented out. A blank value is not "unset": core rejects the empty string and
+refuses to start, and four other services wait on core.
+
+Then start the stack:
+
+```bash
 docker compose up -d
 ```
+
+**Result:** `docker compose ps` shows every service `running`, `db-init` `exited (0)`, and `caddy`
+holding ports 80 and 443.
 
 See the [Environment reference](/self-hosting/env-reference/) for every variable.
 
@@ -126,29 +173,43 @@ See [Install on Coolify](/self-hosting/coolify/).
 
 ## What gets started
 
+Every Kern image is tagged `${KERN_VERSION}`, so an instance runs one version across all of them.
+
 | Service | Image | Role |
 |---|---|---|
 | `caddy` | `caddy:2-alpine` | TLS termination and routing (ports 80/443) |
-| `app` | `ghcr.io/kernaio/app` | SvelteKit PWA (:3000) |
-| `core` | `ghcr.io/kernaio/core` | identity, workspaces, permissions, notifications + most modules (:4000) |
+| `app` | `ghcr.io/kernaio/shell` | SvelteKit PWA (:3000) |
+| `core` | `ghcr.io/kernaio/core` | identity, workspaces, permissions, notifications + the tracker, quire, hr, billing and inventory modules (:4000) |
 | `core-worker` | `ghcr.io/kernaio/core` | background jobs (pg-boss) |
 | `chat` | `ghcr.io/kernaio/chat` | chat + realtime WebSocket gateway (:4100) |
-| `mail` | `ghcr.io/kernaio/mail` | outbound providers, IMAP sync, inbound intake (:4200) |
+| `mail` | `ghcr.io/kernaio/mail` | outbound providers and provider webhooks (:4200) |
 | `collab` | `ghcr.io/kernaio/collab` | Yjs collaborative editing (:4300) |
-| `postgres` | `pgvector/pgvector:pg18` | database (pgvector, pg_trgm, ltree) |
+| `postgres` | `pgvector/pgvector:pg18` | database |
+| `db-init` | `pgvector/pgvector:pg18` | runs to completion on every `up`: creates the extensions, and creates `kern_app` — the non-superuser role the services connect as |
 | `nats` | `nats:2.11-alpine` | event bus (JetStream) |
 | `valkey` | `valkey/valkey:8-alpine` | cache, presence, rate limits |
-| `minio` | `minio/minio` | object storage for files |
+| `minio` | `minio/minio:RELEASE.2025-09-07T16-13-09Z` | object storage for files |
+| `minio-init` | `minio/mc:RELEASE.2025-08-13T08-35-41Z` | runs to completion: creates the bucket |
 
-Optional: `livekit` (`--profile calls`), `gotenberg` (`--profile preview`). See [Compose profiles](/self-hosting/compose-profiles/).
+`minio` and `minio-init` are pinned rather than following `latest`, because this artifact's promise
+is a reproducible install and MinIO has changed its licence and dropped features across releases.
+
+Three more services exist behind a profile and none of them starts by default: `livekit`
+(`--profile calls`), `gotenberg` (`--profile preview`) and `updater` (`--profile autoupdate`). See
+[Compose profiles](/self-hosting/compose-profiles/).
 
 ## First steps after install
 
 1. Open `https://<your-domain>` and sign in with the admin credentials.
-2. Create your first workspace; invite teammates by email.
-3. In **Workspace settings → Modules**, enable the modules you want.
-4. In **Workspace settings → Mail**, configure an outbound provider (or set `SMTP_URL`/`MAIL_FROM` in `.env` as the instance default).
-5. Optionally configure an AI provider key and LiveKit for calls.
+2. Create your first workspace.
+3. Invite teammates from **Settings → Members**.
+4. Switch on the modules you want in **Settings → Modules**.
+5. Configure an outbound email provider in **Settings → Email**, or set `SMTP_URL` and `MAIL_FROM`
+   in `.env` as the instance default.
+6. Register your provider's bounce webhook, if it has one — see
+   [Provider webhooks](/self-hosting/env-reference/#provider-webhooks).
+
+**Result:** **Settings → Email** sends a test message, and it arrives.
 
 ## Useful commands
 
