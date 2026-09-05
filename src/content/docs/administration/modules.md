@@ -7,27 +7,51 @@ Kern's features are delivered as **modules**. The build of Kern you run contains
 
 ## Core vs optional
 
-| | Examples | Can be disabled? |
+| | Modules | Can be disabled? |
 |---|---|---|
 | **Core** | identity, workspaces, members, permissions, notifications, settings, files, search, activity | No — always enabled |
-| **Optional** | tracker, chat, quire, drive, calendar, hr, recruit, crm, automation, mail, calls, ai, time | Yes, per workspace |
+| **Optional** | `tracker`, `chat`, `quire`, `hr`, `mail`, `inventory`, `billing` | Yes, per workspace |
+
+Those seven are what a Kern release contains. See
+[Feature overview](/introduction/feature-overview/) for what each one does, and for the modules that
+are planned and not built.
 
 ## Enabling and disabling
 
-**Workspace settings → Modules** lists every module with its description, version and dependencies. Toggling a module:
+**Settings → Modules** lists every module with its description and version. Switching one:
 
-- **On** — runs the module's `onWorkspaceEnabled` hook (seeding defaults, e.g. Tracker's default work-item types), registers its permissions to the built-in roles, shows its navigation and routes, and lets its jobs and search indexers run for this workspace.
-- **Off** — hides navigation and routes, makes its API return `403 MODULE_DISABLED`, pauses its jobs, and excludes it from search. **Data is kept**; re-enabling restores everything.
+- **On** — runs the module's `onWorkspaceEnabled` hook (seeding defaults, for example Tracker's
+  default work-item types), registers its permissions to the built-in roles, shows its navigation and
+  routes, and lets its jobs and search indexers run for this workspace.
+- **Off** — hides navigation and routes, makes its API answer `403 MODULE_DISABLED`, pauses its jobs
+  and excludes it from search. **Data is kept**; switching it back on restores everything.
 
-A module that another enabled module depends on cannot be disabled first (e.g. `recruit` depends on `calendar` for interview scheduling).
+A module may declare that it needs another one, and Kern then refuses to disable the one underneath
+first. No first-party module declares such a dependency today.
+
+## Capabilities
+
+A module several customers want *different amounts* of splits itself into **capabilities** — named
+sub-features a workspace switches independently. Open a module's row in **Settings → Modules** to
+find them.
+
+HR is the module built this way: one company wants a directory and nothing else, a second wants
+leave and approvals, a third clocks people in at a factory gate. Each is the same module with a
+different set of capabilities on.
+
+Two rules make them safe to use:
+
+- **A capability that is off answers 404, not 403.** Its navigation, settings, widgets and procedures
+  are simply absent — because "you may not have this" is the wrong answer for a workspace that never
+  asked for the feature.
+- **Switching one off destroys nothing.** A capability is a flag, so anything that would need a
+  migration to reverse is not one.
 
 ## Module settings
 
-Each module may declare a **settings schema**. Settings are edited under **Workspace settings → Modules → <module>** (or in the module's own settings page) and validated server-side. Secrets (provider credentials, API keys) live in the encrypted **Integrations** store rather than in plain settings.
-
-## Instance-level defaults
-
-Instance admins can set which modules are enabled by default for new workspaces, and can hide modules instance-wide.
+Each module may declare a **settings schema**. Settings are edited from the module's own page under
+**Settings**, and validated on the server. Secrets — provider credentials, API keys — live in the
+encrypted integrations store rather than in plain settings.
 
 ## Versions
 
@@ -45,4 +69,10 @@ See [Upgrading](/self-hosting/upgrading/) for how to apply a release.
 
 ## Third-party modules
 
-v1.0 ships **no runtime loading of third-party code**: the set of modules is fixed at build time for security and type safety. Third parties can still extend Kern through the public API, outgoing/incoming webhooks, OAuth apps and an iframe/web-component "remote UI" slot. Building your own module package and a custom build is supported and documented in [Module development](/developers/module-development/).
+Kern loads **no third-party code at runtime**: the set of modules is fixed when the images are built,
+for security and for type safety. A module of your own is a build argument, not a fork — see
+[Module development](/developers/module-development/).
+
+Without building an image, a third party can still reach Kern through the public API (OpenAPI 3.1
+per module), workspace-scoped API keys, [MCP](/administration/mcp/), and Chat's incoming webhooks.
+Outgoing webhooks and an embedded "remote UI" slot are not built.

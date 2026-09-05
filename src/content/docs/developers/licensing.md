@@ -29,11 +29,12 @@ Everything in the [`kernel`](https://github.com/KernAIO/kernel) repository, plus
 
 ## AGPL-3.0-only — the product
 
-`app`, `core`, `chat`, `mail`, `collab`, `docs`, the `kern` umbrella, and the first-party modules
-`tracker`, `chat`, `mail` and `billing`.
+`shell`, `core`, `chat`, `mail`, `collab`, `docs`, the `app` umbrella, and the first-party modules
+`module-tracker`, `module-chat`, `module-quire`, `module-hr`, `module-mail`, `module-billing` and
+`module-inventory`.
 
-Each repository's `LICENSE` file is authoritative. Where a package differs from its repository root it
-carries its own `LICENSE` — that is the case for `_template` and `workflow` inside `modules`.
+Each repository's `LICENSE` file is authoritative. `shell` is the repository behind the container the
+Compose file calls `app`.
 
 ## What you may do
 
@@ -61,7 +62,7 @@ would impose its licence on every module copied from it.
 Two things do not get you this freedom:
 
 - **Changing the framework.** You may — it is Apache-2.0 — but you are then maintaining a fork.
-- **Changing the product.** Edit `core`, `app` or a first-party module and the AGPL applies to those
+- **Changing the product.** Edit `core`, `shell` or a first-party module and the AGPL applies to those
   changes.
 
 See [Module development](/developers/module-development/) to start building.

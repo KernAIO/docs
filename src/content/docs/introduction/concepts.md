@@ -21,8 +21,8 @@ Workspaces have:
 
 - **members** with a built-in role — `owner`, `admin`, `member` or `guest` — plus optional custom roles and groups;
 - **modules** that can be enabled or disabled;
-- **integrations & secrets** such as an SMTP/provider configuration, an AI key or LiveKit credentials, stored encrypted;
-- branding, an audit log, import/export.
+- **integrations & secrets** — today, the workspace's outbound email provider — stored encrypted;
+- branding and an audit log.
 
 Invitations can be sent by email or by picking people from workspaces you already share with them. Guests are restricted to explicitly granted projects and channels.
 
@@ -44,7 +44,7 @@ Modules emit typed notifications. User preferences decide, per event type, wheth
 
 ## Activity log
 
-Every change to an object is appended to an **activity stream**. It drives history views, feeds, automation triggers, outgoing webhooks and search indexing — one source of truth instead of five.
+Every change to an object is appended to an **activity stream**. It drives history views, feeds and search indexing — one source of truth instead of three. It is also what an automation engine and outgoing webhooks would read; neither is built.
 
 ## Events and procedures
 
