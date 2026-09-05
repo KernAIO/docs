@@ -56,9 +56,9 @@ webhooks. The `chat` service also runs the realtime gateway every other module u
 
 Spaces and a nested page tree, real-time collaborative editing, comments anchored to the text,
 version history with publish and restore, public links for a published page, a database engine with
-typed columns, filters, relations, rollups and formulas, templates, labels and favourites, import
-from Markdown, HTML, CSV and ZIP, and export to Markdown, HTML, PDF and ZIP. See
-[Quire](/modules/quire/).
+typed columns, filters, relations, rollups and formulas, templates, labels and favourites, import of
+a Notion export, a Confluence export or a folder of Markdown, and export to Markdown, HTML and PDF.
+See [Quire](/modules/quire/).
 
 ### HR
 

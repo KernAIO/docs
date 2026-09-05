@@ -12,7 +12,7 @@ Every module **registers** the permissions it understands. Keys are three dot-se
 ```
 <module>.<resource>.<action>
 tracker.issue.create    tracker.project.manage    chat.channel.join
-docs.page.publish       hr.leave.approve          core.workspace.manage
+quire.page.publish      hr.leave.approve          core.workspace.manage
 ```
 
 Each key declares a label, the **narrowest scope** it can be bound at (`workspace`, `project`, `space` or `object`), which built-in roles get it by default, and whether it is *dangerous* (shown with a warning in the UI).
@@ -35,7 +35,7 @@ A **binding** says: *subject* (user, group or built-in role) gets/loses *permiss
 |---|---|
 | `workspace` | "Support group may `tracker.issue.create` everywhere" |
 | `project` | "Contractors may `tracker.issue.edit` in project KRN only" |
-| `space` | "Everyone may `docs.page.view` in the Handbook space" |
+| `space` | "Everyone may `quire.page.view` in the Handbook space" |
 | `object` | "Guest `alice` may `tracker.issue.comment` on issue KRN-42" |
 
 Bindings can also **deny**.
