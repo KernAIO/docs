@@ -22,13 +22,11 @@ which is what keeps unread counts cheap.
 
 Presence needs Valkey; without it presence is skipped rather than faked.
 
-## Commands and webhooks
+## Commands
 
-Built-in **slash commands** in the composer. An **incoming webhook** — `POST
-/api/chat/webhooks/{token}` with `{ "text": … }` — posts into the channel the token is bound to;
-tokens are managed through the API today, not from a settings screen.
+Built-in **slash commands** in the composer.
 
-Bots, huddles, channel export and cross-workspace shared channels are not built.
+Bots, incoming webhooks, huddles, channel export and cross-workspace shared channels are not built.
 
 ## Search
 

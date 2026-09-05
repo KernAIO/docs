@@ -53,21 +53,30 @@ Open `/<slug>/settings`. Each entry appears only for members holding the permiss
 | **Integrations** | Per-workspace integration configuration. Secrets are encrypted at rest with keys derived from `KERN_SECRET` and are never returned in full by the API. | `core.integrations.manage` |
 | **MCP & AI access** | Switch MCP on, see connected AI clients, and manage API keys; see [Connect AI clients](/administration/mcp/) | `core.integrations.manage` |
 | **Audit log** | Who changed what in the workspace | `core.audit.view` |
+| **Data and privacy** | Request and download an export of the workspace, and schedule its deletion | `core.export.run` or `core.workspace.delete` — either one opens the page, and each half gates itself |
 
 Each enabled module adds its own pages below these — **Email** from Mail, **Plan** from Billing, and
-so on. Your own account settings (Profile, Security, Notifications, Appearance) sit in the same
-place and are not workspace-scoped.
+so on. Your own account settings (Profile, Security, Notifications, Appearance and **Your account**,
+which closes the account) sit in the same place and are not workspace-scoped.
 
-**Archive is the only destructive action in the interface**, and it needs
-`core.workspace.delete`. An archived workspace becomes read-only and drops out of navigation.
-Ownership transfer has no screen and no procedure. Scheduled deletion is on the API only —
-`POST /api/core/workspaces/{workspaceId}/deletion`.
+**Archive** is the reversible destructive action, and it needs `core.workspace.delete`. An archived
+workspace becomes read-only and drops out of navigation. **Deletion** is on **Data and privacy**:
+it asks you to type the workspace name, and it archives the workspace immediately, so you are
+returned to the workspace chooser and the scheduled erasure is offered with its undo from then on.
+Ownership transfer has no screen and no procedure.
 
-There is no **Webhooks & API** section and no **Import / Export** section. Outgoing webhooks are not
-built at all. Importing is per module — Tracker imports CSV, Jira and Linear exports from its own
-screens, and Quire imports a Notion export, a Confluence export or a folder of Markdown from its
-own. Exporting a whole workspace is an API call; see
+There is no **Webhooks & API** section. Outgoing webhooks are not built at all. Importing is per
+module — Tracker imports CSV, Jira and Linear exports from its own screens, and Quire imports a
+Notion export, a Confluence export or a folder of Markdown from its own. Exporting the workspace is
+on **Data and privacy**, and also an API call; see
 [Backups](/self-hosting/backups/#getting-a-workspace-out).
+
+:::caution[An export does not yet include your modules' data]
+An export archive contains the workspace's core data — members, roles, groups, settings, the audit
+log. No first-party module implements an export procedure yet, so nothing from Tracker, Quire, HR,
+Chat, Mail, Billing or Inventory is in it. The archive names each module it could not collect from
+rather than staying silent, so check that list before treating an export as a complete copy.
+:::
 
 ## Notifications across workspaces
 

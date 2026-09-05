@@ -1,6 +1,6 @@
 ---
 title: Instance admin
-description: What an instance administrator is, what the admin console has today, and which instance settings exist only on the API.
+description: What an instance administrator is, what the admin console has today, and which instance settings a screen can change.
 ---
 
 An **instance admin** is a user flagged as administrator of the whole installation. The first one is
@@ -28,8 +28,13 @@ the instance, not that workspace.
 
 | Page | What it does |
 |---|---|
+| **Settings** | The instance settings a screen can change: whether sign-up is open, who may create a workspace, and the support address. See [Instance settings](#instance-settings). |
+| **Users** | Everyone with an account on this installation. Search them, suspend and reactivate an account, and grant or remove the instance admin flag. Suspending revokes that person's sessions server-side. |
 | **Updates** | What this instance runs, what the newest release changes, and the exact command to upgrade. The update mode — notify or automatic — its window and its settling period are set here. |
 | **Modules** | What each module actually registered, checked rather than declared: every procedure, whether it is implemented, and what stands in front of it. Written for somebody building a module. |
+
+You cannot suspend your own account or remove your own instance admin flag; core refuses both, and
+the screen does not offer them.
 
 The Billing module adds two more pages when it is in your build:
 
@@ -42,9 +47,9 @@ Module pages are not filtered by what the workspace you are standing in has enab
 about the instance, so an operator checking what every workspace is billed still finds the screen
 when the module is off where they happen to be.
 
-Nothing else has a screen yet. Users, workspaces, instance-wide mail, sign-up policy, limits and an
-instance audit log are **not in the interface** — see [Instance settings](#instance-settings) for
-what the API offers instead.
+Nothing else has a screen yet. Workspaces, instance-wide mail, limits and an instance audit log are
+**not in the interface** — see [Instance settings](#instance-settings) for what the API offers
+instead.
 
 ## Impersonation is disabled, deliberately
 
@@ -59,19 +64,30 @@ Reading a workspace as an admin is still possible, and it is recorded: core writ
 ## Instance settings
 
 Instance settings are one typed document (`InstanceSettings` in `@kernhq/contracts`), read and
-written over the API at `GET` and `PUT /api/core/admin/settings`. **No screen edits them today.**
+written over the API at `GET` and `PUT /api/core/admin/settings`.
 
-Four of the seven fields are stored and not yet read by anything:
+Three of the seven fields are read by something, and those three are the ones the **Settings** screen
+gives you a control for. The other four are stored, returned by the API and read by nothing at all,
+so the screen does not offer an input for them: `name`, `baseUrl` and `defaultLocale` are shown
+read-only, naming the environment variable that is actually in force, and `mailFrom` is left out
+because it is `null` on every instance — a row reading "not set" would be misleading on a system
+sending mail perfectly well from `MAIL_FROM`.
 
-| Field | Default | What reads it |
-|---|---|---|
-| `allowSignup` | `true` | Every sign-up path. Seeded once from `KERN_SIGNUP`; see [Environment reference](/self-hosting/env-reference/#who-may-create-an-account). |
-| `allowWorkspaceCreation` | `everyone` | Workspace creation. `admins` restricts it to instance admins. |
-| `supportEmail` | `null` | The `mailto:` subject of a Web Push message, when no `VAPID_SUBJECT` is set. |
-| `name` | `Kern` | Nothing yet. |
-| `baseUrl` | from env | Nothing yet; the services read `KERN_BASE_URL`. |
-| `defaultLocale` | `en` | Nothing yet; a user's locale comes from their own preference. |
-| `mailFrom` | `null` | Nothing yet; the services read `MAIL_FROM`. |
+| Field | Default | What reads it | On the screen |
+|---|---|---|---|
+| `allowSignup` | `true` | Every sign-up path. Seeded once from `KERN_SIGNUP`; see [Environment reference](/self-hosting/env-reference/#who-may-create-an-account). | editable |
+| `allowWorkspaceCreation` | `everyone` | Workspace creation. `admins` restricts it to instance admins. | editable |
+| `supportEmail` | `null` | The `mailto:` subject of a Web Push message, when no `VAPID_SUBJECT` is set. | editable |
+| `name` | `Kern` | Nothing; the app's instance name is `PUBLIC_INSTANCE_NAME`. | read-only |
+| `baseUrl` | from env | Nothing; the services read `KERN_BASE_URL`. | read-only |
+| `defaultLocale` | `en` | Nothing; a user's locale comes from their own preference, and mail falls back to `KERN_DEFAULT_LOCALE`. | read-only |
+| `mailFrom` | `null` | Nothing; the services read `MAIL_FROM`. | not shown |
+
+The **Settings** screen is where you open sign-up later. `allowSignup` is seeded once, on first
+boot: from `KERN_SIGNUP` when you set it, and otherwise from whether an administrator can be
+bootstrapped — so an instance installed with `install.sh`, which always writes `KERN_ADMIN_EMAIL`
+and `KERN_ADMIN_PASSWORD`, starts invite-only. Changing `KERN_SIGNUP` afterwards does nothing,
+because the seed only runs while the settings document is unwritten.
 
 ## Other admin procedures on the API
 
@@ -80,10 +96,12 @@ see [API & OpenAPI](/developers/api-openapi/).
 
 | Procedure | Route |
 |---|---|
-| List and search users | `GET /api/core/admin/users` |
-| Suspend, reactivate, or grant instance admin | `POST /api/core/admin/users/{id}/status` |
 | List workspaces with member counts | `GET /api/core/admin/workspaces` |
 | List installed modules and their manifests | `GET /api/core/admin/modules` |
+
+The user procedures behind the **Users** screen are on the same document: `GET
+/api/core/admin/users` lists and searches, and `POST /api/core/admin/users/{id}/status` suspends,
+reactivates and sets the instance admin flag.
 
 ## Operational tasks
 

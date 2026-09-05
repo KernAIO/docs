@@ -68,9 +68,12 @@ caller can present a Kern session:
 
 | Endpoint | Who posts to it | How it is authenticated |
 |---|---|---|
-| `POST /api/chat/webhooks/{token}` | anything you want to post into a channel | the token in the path, which is bound to one channel |
 | `POST /api/mail/webhooks/{provider}` | Mailgun, Postmark, SES or Resend | `?token=` or `x-kern-webhook-token`, matched against `MAIL_WEBHOOK_TOKEN`; SES events are also SNS-signature checked |
 | `POST /api/billing/webhook` | Stripe | the Stripe signature, against `STRIPE_WEBHOOK_SECRET` |
+
+Chat has none. Earlier documentation described `POST /api/chat/webhooks/{token}`; nothing could ever
+create a token for it, so it answered 404 to everyone, and it was removed rather than left
+advertised.
 
 ## Generating clients
 

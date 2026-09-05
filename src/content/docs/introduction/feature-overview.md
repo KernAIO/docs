@@ -15,8 +15,10 @@ module can be switched off per workspace.
 
 ### Platform
 
-- **Accounts** — email and password, magic link, 2FA, passkeys, multi-device sessions, API keys, and
-  Google, GitHub or Microsoft sign-in once you add an OAuth client — see
+- **Accounts** — email and password, magic link, 2FA, passkeys, multi-device sessions and API keys.
+  Google, GitHub and Microsoft sign-in is wired and configurable, but no sign-in through a real
+  provider app has been completed on a Kern instance yet — try it yourself before you offer it to
+  your team. See
   [Environment reference](/self-hosting/env-reference/#sign-in-with-google-github-or-microsoft).
 - **Workspaces** — unlimited per instance; members, groups, custom roles, invitations by email or
   from the directory of people you already share a workspace with, archive, branding, encrypted
@@ -48,9 +50,8 @@ CSV/Jira/Linear import, and a per-issue chat channel. See [Tracker](/modules/tra
 
 Public and private channels, DMs and group DMs, object channels attached to an issue, threads,
 reactions, mentions, read state and unread counters, pins and bookmarks, search, file sharing,
-typing and presence, mute and per-channel notification levels, slash commands, and incoming
-webhooks. The `chat` service also runs the realtime gateway every other module uses. See
-[Chat](/modules/chat/).
+typing and presence, mute and per-channel notification levels, and slash commands. The `chat`
+service also runs the realtime gateway every other module uses. See [Chat](/modules/chat/).
 
 ### Quire
 

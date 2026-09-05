@@ -170,7 +170,8 @@ provider at the URL above after the upgrade.
 ## Who may create an account
 
 `KERN_SIGNUP` seeds the sign-up policy on the very first boot and is ignored afterwards. Once the
-instance exists, core owns the setting.
+instance exists, core owns the setting, and you change it on the **Settings** page of the admin
+console — see [Instance admin](/administration/instance-admin/#instance-settings).
 
 | Value | Meaning |
 |---|---|

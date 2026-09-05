@@ -7,7 +7,7 @@ A few ideas recur throughout Kern. Learning them once makes every module familia
 
 ## Instance
 
-An **instance** is one Kern installation: one domain, one database, one set of users. An instance has **instance admins**, who pass every permission check in every workspace and reach the admin console at `/<workspace>/admin`. That console holds updates and a module inspector today, plus billing's plans and subscriptions where billing is configured; users, workspaces, instance mail and limits are on the API and have no screen yet. See [Instance admin](/administration/instance-admin/).
+An **instance** is one Kern installation: one domain, one database, one set of users. An instance has **instance admins**, who pass every permission check in every workspace and reach the admin console at `/<workspace>/admin`. That console holds instance settings, the user list, updates and a module inspector today, plus billing's plans and subscriptions where billing is configured; workspaces, instance mail and limits are on the API and have no screen yet. See [Instance admin](/administration/instance-admin/).
 
 ## Users and accounts
 

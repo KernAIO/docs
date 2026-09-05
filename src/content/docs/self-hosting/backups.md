@@ -98,10 +98,11 @@ owned by the application role so row-level security survived the restore.
 
 ## Getting a workspace out
 
-A workspace export is separate from an infrastructure backup, and it is **on the API only** — no
-screen offers it yet.
+A workspace export is separate from an infrastructure backup. Anyone holding `core.export.run` in
+the workspace can request one from **Settings → Data and privacy** and download it there when it is
+ready; see [Workspaces](/administration/workspaces/#workspace-settings).
 
-Anyone holding `core.export.run` in the workspace can start one:
+The same thing over the API, for a script:
 
 ```bash
 # start an export
