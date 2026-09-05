@@ -65,7 +65,10 @@ it asks you to type the workspace name, and it archives the workspace immediatel
 returned to the workspace chooser and the scheduled erasure is offered with its undo from then on.
 Ownership transfer has no screen and no procedure.
 
-There is no **Webhooks & API** section. Outgoing webhooks are not built at all. Importing is per
+There is no **Webhooks & API** section, and nothing in workspace settings registers a URL for the
+workspace as a whole. The one outgoing webhook Kern has belongs to a single workflow transition —
+Tracker's **Call webhook** post-function, described in
+[Webhooks](/developers/api-openapi/#outgoing). Importing is per
 module — Tracker imports CSV, Jira and Linear exports from its own screens, and Quire imports a
 Notion export, a Confluence export or a folder of Markdown from its own. Exporting the workspace is
 on **Data and privacy**, and also an API call; see

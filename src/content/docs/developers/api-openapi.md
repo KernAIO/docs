@@ -61,9 +61,48 @@ List endpoints accept `cursor` and `limit` (1–200, default 50) and return `{ i
 
 ## Webhooks
 
-**Outgoing webhooks are not built** — nothing in Kern calls out to a URL you register.
+Outgoing and incoming are separate questions, and Kern answers them differently. Read the one you
+need.
 
-Two modules accept an **incoming** one, and each authenticates it in its own way because neither
+### Outgoing
+
+There is no workspace-level webhook registry. Nothing lets you register a URL and receive every
+event, and no screen anywhere in Kern lists your outgoing webhooks.
+
+One feature does call out to an address you choose: Tracker's **Call webhook** workflow
+post-function. Put it on a transition, and Tracker sends an HTTP request every time that transition
+runs.
+
+| Question | Answer |
+|---|---|
+| What it sends | `POST` by default, or `PUT` or `GET`, to the URL in the post-function's config, with the headers it names |
+| What is in the body | the post-function's `payload`, or the issue when the post-function sets none |
+| Whether it is signed | **no.** Kern adds no signature header, so the receiver has to authenticate the call from a header you set yourself |
+| Who can add one | anyone with `tracker.workflow.manage` — owner and admin by default |
+| What happens when it fails | nothing to the issue. The transition is committed first and the call is fire-and-forget; a refusal or a transport failure is logged by the service hosting Tracker |
+
+Adding one is an API call today. **Settings → Workflows** shows a transition's rules as sentences
+and does not edit them, so you send the whole workflow definition to
+`POST /api/tracker/workflows` or `PATCH /api/tracker/workflows/{id}` with a
+`{"type": "webhook", "config": {"url": "..."}}` entry in the transition's `postFunctions`. No
+workflow template Kern ships contains one, so nothing calls out until you add it.
+
+Where it may point is not up to the URL alone. Tracker refuses anything but `http` and `https`,
+refuses credentials in the URL, resolves the hostname before opening a socket and refuses the call
+when any address it answers with is loopback, private, link-local, unique-local, multicast or
+reserved. The socket then goes to the address that was checked, so a second lookup cannot answer
+differently. Redirects are not followed. The response is read to 64 KB and the call gives up after
+10 seconds.
+
+:::caution[A refused webhook is silent to the person who moved the issue]
+The transition succeeds either way. If a workflow webhook stops arriving, read the log of the
+service hosting Tracker — `core` in the shipped stack — for `tracker: workflow webhook refused`,
+which carries the address and the reason.
+:::
+
+### Incoming
+
+Two modules accept an incoming webhook, and each authenticates it in its own way because neither
 caller can present a Kern session:
 
 | Endpoint | Who posts to it | How it is authenticated |

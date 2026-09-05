@@ -44,7 +44,7 @@ Modules emit typed notifications. User preferences decide, per event type, wheth
 
 ## Activity log
 
-Every change to an object is appended to an **activity stream**. It drives history views, feeds and search indexing — one source of truth instead of three. It is also what an automation engine and outgoing webhooks would read; neither is built.
+Every change to an object is appended to an **activity stream**. It drives history views, feeds and search indexing — one source of truth instead of three. It is also what an automation engine would read, and no Automation module ships. Nothing reads the stream to call out to a URL either: Kern's one outgoing webhook is a Tracker workflow post-function, fired by a transition rather than by this stream — see [Webhooks](/developers/api-openapi/#outgoing).
 
 ## Events and procedures
 

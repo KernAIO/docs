@@ -24,12 +24,39 @@ measured against. This page describes what a workspace gets when it switches Tra
 
 Each type follows a workflow: **statuses** with categories (backlog, to do, in progress, done,
 cancelled, triage), **transitions** with **conditions** (who may take them) and **validators**
-(what must be filled in first), and **approvals**. A **visual editor** draws the graph. Workflow
-schemes map types to workflows per project, and every status change records how long the issue
-sat in the previous status, which is what the flow reports are computed from.
+(what must be filled in first), and **approvals**. Workflow schemes map types to workflows per
+project, and every status change records how long the issue sat in the previous status, which is
+what the flow reports are computed from.
 
-Post-functions — set a field, assign, notify, call a webhook when a transition runs — are declared
-in the model and not executed yet.
+**Settings → Workflows** needs `tracker.workflow.manage` — owner and admin by default. It edits the
+statuses, and it reads each transition's rules back as sentences: *Only the assignee*, *Sets the
+resolution to "done"*, *Calls https://…*. It does not edit those rules and there is no graph editor,
+so changing what a transition requires or does means sending the whole definition to
+`PATCH /api/tracker/workflows/{id}`.
+
+### Post-functions
+
+Post-functions run when a transition runs. The ones that change the issue are written in the same
+transaction as the status change, so a transition never half-applies:
+
+| Post-function | What it does |
+|---|---|
+| Set a field | writes a value onto the issue |
+| Assign | assigns the issue to whoever moved it, the reporter, a named person or nobody |
+| Set the resolution | sets or clears the resolution — this is what stock workflows use to resolve an issue as *done* or *cancelled* |
+| Notify | notifies the assignee, the reporter, the project lead, a role or a group |
+| Create a sub-item | creates a sub-issue under the one being moved |
+| **Call a webhook** | sends an HTTP request to a URL configured on the transition |
+| Run automation rule | **nothing.** It waits on the [Automation](/modules/automation/) module, which is not built |
+
+The webhook is the one that leaves your instance, so it is worth knowing what it will and will not
+do. It is sent after the change is committed and cannot fail the transition — a broken endpoint is a
+line in the log of the service hosting Tracker, not an error for the person who moved the issue. It
+carries no signature, so a receiver has to authenticate it from a header you set on the
+post-function. And it may only reach public addresses: `http` and `https` only, the hostname
+resolved and refused if it lands on a loopback, private, link-local or reserved address, the socket
+pinned to the address that was checked, redirects not followed. Full behaviour is in
+[Webhooks](/developers/api-openapi/#outgoing).
 
 ## Issues
 

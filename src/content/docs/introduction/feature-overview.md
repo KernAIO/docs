@@ -105,7 +105,10 @@ the same notice.
 Some smaller pieces are planned inside modules that do ship:
 
 - **Resumable (tus) uploads.** An upload is a single PUT today, capped at 500 MB.
-- **Signed outgoing webhooks.** Nothing in Kern calls out to a URL you register.
+- **A workspace webhook registry, with signed deliveries.** One outgoing webhook exists today —
+  Tracker's *Call webhook* workflow post-function, set on a single transition and sent unsigned. What
+  is missing is registering a URL once and receiving every event, and a signature the receiver can
+  check. See [Webhooks](/developers/api-openapi/#outgoing).
 - **A per-user email inbox.** Mail sends; it does not receive. There is no IMAP account, no intake
   address and no email-to-issue — Tracker exposes `issues.createFromEmail` and nothing calls it.
 - **Per-workspace SSO (OIDC/SAML) and SCIM.** The plan entitlement exists; registering an identity

@@ -74,7 +74,13 @@ for security and for type safety. A module of your own is a build argument, not 
 [Module development](/developers/module-development/).
 
 Without building an image, a third party can still reach Kern through the public API (OpenAPI 3.1
-per module), workspace-scoped API keys and [MCP](/administration/mcp/). Incoming webhooks are a
-module's own affair — Mail and Billing accept one each, listed in
-[API & OpenAPI](/developers/api-openapi/#webhooks) — and there is no general endpoint a third party
-can register against. Outgoing webhooks and an embedded "remote UI" slot are not built.
+per module), workspace-scoped API keys and [MCP](/administration/mcp/). Webhooks are a module's own
+affair in both directions, and there is no general endpoint or registry above them:
+
+- **Incoming.** Mail and Billing accept one each, listed in
+  [Webhooks](/developers/api-openapi/#incoming). Nothing lets a third party register another.
+- **Outgoing.** Tracker's **Call webhook** workflow post-function calls a URL set on a transition,
+  and it is the only thing in Kern that does. It is unsigned, and there is nowhere to register a URL
+  for the workspace as a whole — see [Webhooks](/developers/api-openapi/#outgoing).
+
+An embedded "remote UI" slot is not built.

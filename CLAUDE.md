@@ -119,6 +119,23 @@ Astro Starlight, themed with the Kern paper palette. Runs on **:4400**.
   and `workspaces.md` both described Quire's importers, and both were wrong in the same way while
   `modules/quire.md` was right — because whoever fixed the module page did not grep for the other
   two. When you correct a fact, grep the whole `src/content/docs` tree for it.
+- **"Not built" rots exactly like a feature description, and an under-claim is as wrong as an
+  over-claim.** Five pages said outgoing webhooks were not built and that "nothing in Kern calls out
+  to a URL you register", while `module-tracker`'s workflow **Call webhook** post-function had been
+  sending one since 2026-08-22 — and had been hardened against SSRF hours earlier *because* it is
+  real and reachable. The source of the error was another page in this site: `modules/tracker.md`
+  said post-functions were "declared in the model and not executed yet", and the round copied that
+  outwards instead of reading `transitions.ts`, which applies every one of them, and the shipped
+  workflow templates, which all use `resolution.set`. A negative claim needs the same re-derivation
+  as a positive one, and a denial is the shape nobody re-checks, because it reads as caution.
+- **Four distinctions decide whether a capability sentence is true, and dropping one makes it
+  false.** Outgoing or incoming; which module; whether a customer can actually reach it; and whether
+  a workspace admin can configure it, or only an operator, or nobody. Tracker's webhook needs all
+  four: outgoing, Tracker, reachable, and admin-configurable *through the API only* — **Settings →
+  Workflows** renders a transition's rules as sentences and edits none of them. A feature with an
+  endpoint and no way to switch it on is the same defect pointed the other way: chat's incoming
+  webhook had a route and no procedure to create a token, so it answered 404 to everyone for as long
+  as it existed. Ask "who turns this on, and from where" before writing that something exists.
 - `src/styles/kern.css` maps Starlight's variables onto the Ink/Paper tokens from `shell/DESIGN.md`,
   in the proportions the marketing site uses. Change a colour there, not here.
 - The fonts are served from `public/fonts` and declared in `src/styles/fonts.css`, copied from the
