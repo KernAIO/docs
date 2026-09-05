@@ -8,8 +8,8 @@ The repositories are **public**, so every commit is visible the moment it is pus
 - Write READMEs, docs, and issue/PR text for external contributors, not for ourselves.
 - Keep commit history clean and meaningful — it is part of what people judge the project by.
 - Every repo carries LICENSE, CLA.md, CODE_OF_CONDUCT.md, SECURITY.md, CONTRIBUTING.md.
-- **Two licences, split at the framework boundary.** The `kernel` repo and `modules`'
-  `_template` + `workflow` are **Apache-2.0** so anyone can write a closed module; the product —
+- **Two licences, split at the framework boundary.** The `kernel` repo (which now holds `workflow`)
+  and `KernAIO/module-template` are **Apache-2.0** so anyone can write a closed module; the product —
   `shell`, `core`, `chat`, `mail`, `collab`, `docs`, this umbrella, the first-party modules — is
   **AGPL-3.0-only**. A new package inherits its repo's licence unless it is something a third-party
   module must import, and then it is Apache-2.0 with its own LICENSE file. Apache-2.0 packages take
@@ -61,11 +61,11 @@ Mailpit for `mail`. Things learned the hard way:
   Fail when `process.env.CI` is set.
 
 ## Writing
-Documentation — READMEs, guides, runbooks, `docs/`, and any procedure someone follows — uses the
-`adhd-friendly-ste-technical-writer` skill in `.claude/skills/`: goal first, one action per step,
-short sentences, conditions before commands, an observable result after every important action.
-It is a house style inspired by ASD-STE100, not certified compliance — do not claim otherwise.
-It governs documents for readers. Code comments and commit messages keep the voice they have.
+Documentation — READMEs, guides, runbooks, `docs/`, ADRs, and any procedure someone follows — uses
+the `kern-writing` skill in `.claude/skills/`: decide where it belongs first, goal before steps, one
+action per step, conditions before commands, an observable result after every important action, and
+never the present tense for something that is not built. It governs documents for readers. Code
+comments and commit messages keep the voice they have; user-facing strings belong to `kern-language`.
 
 ## Quality bar
 - `pnpm typecheck && pnpm lint && pnpm test && pnpm build` must pass before pushing.
@@ -103,6 +103,22 @@ Astro Starlight, themed with the Kern paper palette. Runs on **:4400**.
   Deployment of new builds happens outside this repository's workflows.
 - Write for someone who has never seen Kern. Anything that assumes context from the other repositories
   belongs in the Developers section, with a link to the source.
+- **Nothing here is checked against the product, so every page rots silently.** `pnpm build` proves
+  the links resolve and says nothing about whether a sentence is true, and a page describing a
+  feature that was never built reads exactly like one describing a feature that was. On 2026-09-05 a
+  sweep against the code found ten pages describing a different product: five planned modules listed
+  as shipping, a `/s3` storage route that returns 403 on every upload, an admin console with nine
+  areas where two exist, `docs.page.*` permission keys for a module now called `quire`, a turbo task
+  graph the umbrella cannot have, `--profile search` and `--profile observability` for services no
+  Compose file contains, and a link to an ADR 0011 that does not exist. Re-derive a claim from the
+  code before you edit the sentence around it: `grep` the contract for the procedure, the Caddyfile
+  for the route, `docker-compose.yml` for the profile, the module's `capabilities` for the switch.
+  Two claims in particular pull the whole page out of date when a feature lands — what a module
+  imports and exports, and what an admin can reach from a screen.
+- **A page in this site can only be as current as the page it contradicts.** `feature-overview.md`
+  and `workspaces.md` both described Quire's importers, and both were wrong in the same way while
+  `modules/quire.md` was right — because whoever fixed the module page did not grep for the other
+  two. When you correct a fact, grep the whole `src/content/docs` tree for it.
 - `src/styles/kern.css` maps Starlight's variables onto the Ink/Paper tokens from `shell/DESIGN.md`,
   in the proportions the marketing site uses. Change a colour there, not here.
 - The fonts are served from `public/fonts` and declared in `src/styles/fonts.css`, copied from the

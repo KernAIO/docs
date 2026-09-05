@@ -3,7 +3,12 @@ title: Drive & Calendar
 description: Planned modules for file storage with sharing and previews, and calendars with overlays from other modules.
 ---
 
-**Planned. Neither module is in a release yet, and no code for either exists in the repositories.**
+:::caution[Planned. Not in a release yet.]
+This page describes what the two modules will do. Neither Drive nor Calendar ships today, and no
+code for either exists in the repositories. Files themselves are built — every module attaches
+them — but there is no Drive to browse them in. See the
+[roadmap](https://github.com/KernAIO/app/blob/main/ROADMAP.md).
+:::
 
 Kern's wiki used to be described on this page. It is now its own module, **Quire**, and it is
 built — see [Quire](/modules/quire/).
