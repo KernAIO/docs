@@ -1,6 +1,6 @@
 ---
 title: Quire
-description: Kern's wiki — spaces, a nested page tree, real-time collaborative editing, version history, comments and a database engine.
+description: Kern's wiki — spaces, a nested page tree, real-time collaborative editing, version history, comments, databases, public links, templates, import and export.
 ---
 
 Quire is Kern's wiki. A space holds a tree of pages; a page's prose is a Yjs document that everyone
@@ -60,10 +60,10 @@ Removing a page has three levels, and they are not the same thing:
 3. **Purge** deletes the page, its collaborative document and its history. It cannot be undone, and
    it needs `quire.page.delete`.
 
-Creating, renaming, archiving and trashing a page are in the interface. Reordering and reparenting
-(`pages.move`) are on the API, and the sidebar has no drag-and-drop. Listing the trash
-(`pages.trash`), restoring from it (`pages.restore`) and purging (`pages.purge`) are on the API, and
-no screen lists what is in the trash.
+Creating, renaming, archiving and trashing a page are in the interface, and each space has a **trash
+screen** that lists what is in it, restores a page with everything under it, and purges. Reordering
+and reparenting (`pages.move`) are on the API only: the sidebar has no drag-and-drop and no "move
+to" action.
 
 ## Writing together
 
@@ -84,10 +84,26 @@ the network. Edits made offline merge when the connection comes back.
 
 **Formatting is a closed set**, and it is worth knowing why: everything the editor can write, the
 read side has to be able to draw, and a node the editor produces but no renderer understands
-disappears silently when the document is read back. The set is paragraphs, headings 2 to 4, bullet
-and numbered lists, block quotes, code blocks, horizontal rules, and the marks bold, italic,
-strikethrough, inline code and link. Tables, images, file embeds, callouts and toggles are not
-in it.
+disappears silently when the document is read back. A page uses the wide wiki schema, which is a
+superset of the narrow one an issue description and a chat message are written in.
+
+Type `/` in a page to insert any of it:
+
+| Group | What it offers |
+|---|---|
+| Basic | Paragraph, headings 1 to 6 |
+| Lists | Bullet, numbered and task lists |
+| Blocks | Block quote, code block, **table**, **toggle**, horizontal rule, **callout** in five tones, Mermaid diagram |
+| Insert | Person mention (`@`), page mention (`+`) |
+| Macros | Child pages, page excerpt, include a page, include an excerpt, recently updated, contributors, expand, status lozenge in five tones |
+
+The marks are bold, italic, underline, strikethrough, highlight, inline code and link.
+
+**Images, link embeds, object embeds and Excalidraw or draw.io diagrams are in the schema and not in
+Quire's menu.** Each of those needs a picker the host passes to the editor — a file picker, an
+unfurl, an object picker, a drawing surface — and the page editor passes none of them. A menu entry
+with nothing behind it inserts a block that never becomes a picture, so the entry is hidden rather
+than offered. A document that already contains one of these nodes still renders.
 
 The wire protocol, the document naming and the access check are described in
 [Collab protocol](/developers/collab-protocol/).
@@ -103,10 +119,28 @@ banner offering **Publish** and **Revert**.
 Reverting throws the draft away and puts the published version back. It captures the draft as a
 version of its own first, so reverting is not a way to lose an afternoon's writing.
 
-**Publishing records which version a reader should be served; serving it is not built.** Everyone
-with read access opens the live document — read-only if they may not write it — whatever has been
-published. The published version is what version history marks and what **Revert** goes back to, and
-nothing renders it as a page.
+Inside Kern, everyone with read access opens the live document — read-only if they may not write
+it — whatever has been published. The published version is what version history marks, what
+**Revert** goes back to, and **what a public link serves**.
+
+## Public links
+
+A **publication** turns a page and its descendants into a site a signed-out stranger can read, at
+`/p/<workspace>/<publication>`. It needs `quire.page.publish`.
+
+A publication serves the **published version** of each page, never the draft, and it walks only
+pages that are still there to serve. A page that is archived, trashed, opted out, or has never been
+published stops the walk at that point. So publishing is what a reader sees, and an unpublished
+draft is never public by accident.
+
+A publication carries an optional password, an optional expiry, an SEO title and description, an
+Open Graph image, an `indexable` flag and a theme. The site answers its own sitemap and robots
+document, and has its own search.
+
+**Opting a page out is absolute, not per publication.** An opt-out recorded against one publication
+would say nothing about a publication somebody roots above that page next month, and its author
+would never see it — so the flag lives on the page and holds against publications that do not exist
+yet.
 
 ## History
 
@@ -164,9 +198,8 @@ notification carries the first 140 characters of the comment, with the quoted te
 Every notification Quire sends is best effort. A comment must not fail to post because the
 notification service is briefly unavailable, so a failure is logged rather than raised.
 
-The `@` menu is not wired into Quire's editors yet — neither the comment composer nor the page body
-offers one. The server reads mentions out of whatever body it is given, so a mention posted through
-the API notifies; there is no picker on the screen.
+Both writing surfaces offer the picker: type `@` in the page body or in a comment and choose a
+person from the list.
 
 ## Search
 
@@ -185,9 +218,6 @@ The search box in the sidebar is a different thing and is not affected: it filte
 loaded for the space you are in, so it answers as you type and covers every space you can open.
 
 ## Databases
-
-**The database engine is built and has no interface.** Everything in this section is reachable over
-the module's API, and nothing in Kern draws it yet.
 
 A page can be a database, and **a row is a page**. That is what makes a row openable, commentable,
 versioned and searchable without any of it being built a second time.
@@ -214,8 +244,23 @@ query: the property is looked up first, and an unknown key is refused.
   server evaluates with a database connection already open. Function names are matched
   case-insensitively, over a fixed table of text, number, logic and date functions.
 
-Six view kinds — table, board, calendar, gallery, list and timeline — are declared, and a view's
-filters and sorts are applied to the rows it returns. Nothing renders a view.
+Five view kinds are drawn — **table, board, calendar, gallery and list** — each applying the view's
+own filters and sorts. A row opens in a side panel with a typed editor per column. **Timeline is
+declared in the contract and has no renderer**; a timeline view draws the table instead and says so
+on the screen.
+
+## Templates, labels and finding your way back
+
+**Templates** seed a new page or a whole new space. Kern ships starters, and a workspace saves its
+own from any existing page. A template scoped to one space is an *addition* to what is offered
+there, never a replacement for the workspace-wide ones.
+
+**Labels** are workspace-wide, named and coloured, and a page carries any number of them.
+
+**Favourites** are per person and reorderable, **recents** are per person, and **watchers** decide
+who is notified about a page. Each of these lists is filtered to the person asking: row-level
+security fences the workspace, which is not a privacy boundary, so one person's favourites never
+appear in another's sidebar.
 
 ## Permissions
 
@@ -232,7 +277,9 @@ space, which beats one on the workspace, and a deny beats an allow at the same l
 | `quire.page.create` | Create pages | owner, admin, member |
 | `quire.page.edit` | Write in a page, rename it, move it | owner, admin, member |
 | `quire.page.comment` | Comment without being able to change the page | owner, admin, member, guest |
-| `quire.page.publish` | Decide which version is published | owner, admin, member |
+| `quire.page.publish` | Decide which version is published, and run a public site | owner, admin, member |
+| `quire.page.export` | Take a page, a section or a space out | owner, admin, member |
+| `quire.page.import` | Bring a Notion, Confluence or Markdown export into a space | owner, admin |
 | `quire.page.delete` | Purge a page and its history permanently | owner, admin |
 
 Defaults are inherited upwards: owner ⊇ admin ⊇ member ⊇ guest.
@@ -241,33 +288,54 @@ The navigation rail and the page menu ask the **workspace-level** answer, which 
 question for "should this appear at all" and the wrong one for "may I edit this page". The server
 asks the space- or page-scoped question and is what refuses.
 
+## Import and export
+
+**Export** takes a page, a page and its descendants, or a whole space, as **Markdown, HTML or PDF**.
+More than one page comes back as a ZIP. It needs `quire.page.export`.
+
+Word is declared in the contract and **refused by the server**, with a message saying so, and the
+dialog does not offer it. That is deliberate: a `.docx` that loses tables and callouts is worse than
+an honest refusal.
+
+Every page under the scope is checked against the requester's own `quire.page.view`, so an export by
+somebody with a page-scoped deny is a **smaller file, not a refusal** — and `counts.skipped` says
+how many pages were left out. That is the difference between an export that is quietly missing
+pages and one that says so.
+
+PDF is the one format with a dependency: it renders through Gotenberg, which the
+[`preview` Compose profile](/self-hosting/compose-profiles/#--profile-preview--gotenberg) starts.
+Without it a PDF export fails and names the container; every other format is unaffected.
+
+**Import** reads a **Notion export, a Confluence export or a folder of Markdown** into one space, and
+needs `quire.page.import`. The archive is uploaded as a file first and then named, because a real
+export is hundreds of megabytes and that is a file, never a request body.
+
+Both run as jobs. **Transfers** lists your own, with their state and their counts, and an import's
+report names every file that would not map rather than failing the whole run.
+
 ## Known defects
 
-Two authorisation checks disagree with what the interface shows. Both are in the module rather than
-in this page:
+One authorisation check still disagrees with what the interface shows, and it is in the module
+rather than in this page:
 
-- **A workspace admin cannot delete another person's comment.** The check asks for a permission key
-  that was never declared, and an undeclared key passes only for an instance admin or a workspace
-  owner.
-- **The Publish button appears for anybody who may edit.** The menu item and the banner's button are
-  shown to holders of `quire.page.edit`, while the server requires `quire.page.publish`, so somebody
-  holding one and not the other is offered a button that returns 403.
+- **A workspace admin cannot delete another person's comment.** The check asks for
+  `quire.page.manage`, which the module never declares, and an undeclared key passes only for an
+  instance admin or a workspace owner.
 
 ## What is not built
 
 No dates and no promises — this is what has no code today:
 
-- serving a published version to a reader instead of the live draft
-- public or shared links to a page
-- import and export of any kind, including Markdown and PDF
-- templates
-- embeds of issues, files or other pages
-- tables and images in the editor
-- any interface for databases
-- the `@` menu in the page editor and the comment composer
-- a trash screen
-- drag-and-drop in the page tree
-- a space settings screen
+- moving a page in the tree from the interface: no drag-and-drop and no "move to" action
+  (`pages.move` is on the API)
+- a space settings screen — renaming a space, its icon, its home page, its visibility and archiving
+  it are on the API (`spaces.update`, `spaces.archive`)
+- editing a comment after posting it (`comments.update` is on the API)
+- naming a version at the moment you take it (`versions.create` is on the API)
+- inserting an image, a link embed, an object embed, or an Excalidraw or draw.io diagram — the
+  schema holds all five and the editor offers none of them
+- a timeline view for a database
+- indexing pages in `restricted` and `private` spaces for workspace search
 - whiteboards, page analytics, blogs and AI
 
 ## See also
