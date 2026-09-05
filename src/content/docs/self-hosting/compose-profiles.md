@@ -22,8 +22,8 @@ own. See [Feature overview](/introduction/feature-overview/).
 Adds `gotenberg` (`gotenberg/gotenberg:8`). **Quire's PDF export** is the one thing that uses it: the
 export job renders a page to HTML and posts it to Gotenberg's Chromium.
 
-Every other Quire export format — Markdown, HTML and ZIP — works without it. So does everything
-else in Kern.
+Quire's other export formats — Markdown and HTML, either of them as a ZIP when the export covers
+more than one page — work without it. So does everything else in Kern.
 
 ```bash
 docker compose --profile preview up -d
@@ -62,16 +62,12 @@ mints a room token or renders a call surface — so this profile starts a server
 product talks to. It is here for the release that ships calls. Leave it off; see
 [Calls](/modules/calls/).
 
-## `--profile search` — Meilisearch (planned)
+## There are three profiles, and no others
 
-Kern searches with Postgres full-text search and trigram indexes, which needs no extra service. A
-Meilisearch provider is planned, and this profile is reserved for it. There is no `meilisearch`
-service in the Compose file today.
-
-## `--profile observability` — GlitchTip (planned)
-
-Error tracking and traces for operators who want them. Reserved in the same way; there is no service
-behind it yet.
+`preview`, `autoupdate` and `calls` are the whole list. A `--profile` naming anything else — the
+`search` and `observability` profiles earlier versions of this page described — matches no service,
+so Compose starts nothing extra and reports no error. Kern searches with Postgres full-text search
+and trigram indexes and needs no search container; error tracking is not bundled.
 
 ## Combining profiles
 

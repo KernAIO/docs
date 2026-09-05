@@ -71,10 +71,14 @@ admin can switch it off under **Admin → Updates**, which stops the request bei
 | `KERN_DB_APP_PASSWORD` | Password of `kern_app`, the role every service actually connects as. |
 | `S3_SECRET_KEY` | MinIO root password / S3 secret key. |
 | `MAIL_WEBHOOK_TOKEN` | Shared secret your email provider's bounce and complaint webhooks must present. Required — see [Provider webhooks](#provider-webhooks). |
-| `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET` | Generated and passed to the services, and nothing reads them yet: no calls module ships. |
 
 Keep every one of these hex or alphanumeric. `KERN_DB_APP_PASSWORD` goes into a `DATABASE_URL`,
 where a `@`, `:`, `/` or `#` is parsed as URL syntax.
+
+`LIVEKIT_API_KEY` and `LIVEKIT_API_SECRET` are in `.env.example` and are **not** secrets of yours to
+generate. They ship empty, `install.sh` no longer offers to fill them in, and no Kern service reads
+either one — there is no calls module. Leave them empty; the `calls` Compose profile is there for
+the release that ships calls.
 
 ## Postgres
 

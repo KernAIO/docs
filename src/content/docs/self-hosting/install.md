@@ -106,7 +106,9 @@ What the installer does:
    `ACME_EMAIL` is set to `internal` so Caddy uses its internal CA.
 5. If `.env` already exists, it changes nothing except to fill in `KERN_DIR`,
    `KERN_DB_APP_PASSWORD` and `MAIL_WEBHOOK_TOKEN` when they are missing.
-6. Asks which optional [Compose profiles](/self-hosting/compose-profiles/) to start.
+6. Asks whether to start office and PDF previews (Gotenberg, the `preview`
+   [Compose profile](/self-hosting/compose-profiles/)). That is the only profile it offers; it no
+   longer asks about video calls, because nothing in Kern places one.
 7. Asks whether to install two user timers: one that lets the instance
    [upgrade itself](/self-hosting/upgrading/) once you switch that on in **Admin → Updates**, and
    one that runs [`kern-backup.sh`](/self-hosting/backups/) nightly.

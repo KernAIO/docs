@@ -122,7 +122,7 @@ value is generated once and kept in the resource's environment.
 
 :::danger
 **Back up these values with your database.** `KERN_SECRET` derives the keys that encrypt stored
-secrets — SMTP passwords, API keys, IMAP credentials. A database dump restored without the same
+secrets — SMTP passwords, provider API keys, workspace integrations. A database dump restored without the same
 `KERN_SECRET` leaves all of them unreadable. If you ever delete and recreate the resource, Coolify
 generates new values.
 :::
