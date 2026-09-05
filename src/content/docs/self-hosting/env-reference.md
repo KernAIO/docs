@@ -76,9 +76,12 @@ Keep every one of these hex or alphanumeric. `KERN_DB_APP_PASSWORD` goes into a 
 where a `@`, `:`, `/` or `#` is parsed as URL syntax.
 
 `LIVEKIT_API_KEY` and `LIVEKIT_API_SECRET` are in `.env.example` and are **not** secrets of yours to
-generate. They ship empty, `install.sh` no longer offers to fill them in, and no Kern service reads
-either one — there is no calls module. Leave them empty; the `calls` Compose profile is there for
-the release that ships calls.
+generate. `LIVEKIT_API_KEY` ships as the fixed identifier `kern` — it names which of a LiveKit
+server's key pairs is meant, and a fixed name is what the mounted `livekit.yaml` can refer to, since
+Compose does not interpolate into a mounted file. `LIVEKIT_API_SECRET` ships empty. `install.sh` no
+longer offers to fill either in, and no Kern service reads either one — there is no calls module.
+Leave them as they are; the `calls` Compose profile is there for the release that ships calls, and
+starting it needs a secret you would have to set yourself.
 
 ## Postgres
 
