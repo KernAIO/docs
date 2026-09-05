@@ -7,7 +7,11 @@ A workspace is Kern's tenant. Every module's data belongs to exactly one workspa
 
 ## Creating a workspace
 
-Any user can create a workspace (unless the instance restricts creation to admins). The creator becomes the **owner**. A workspace has a display name, a URL slug (`/w/<slug>/…`), an optional logo and colour, and a default locale/timezone.
+Any user can create a workspace, unless the instance sets `allowWorkspaceCreation` to `admins`. The
+creator becomes the **owner**.
+
+A workspace has a display name and a URL slug. The slug is the **first segment of every path**:
+`/acme/settings`, `/acme/admin/updates`, `/acme/tracker`. There is no `/w/` prefix.
 
 ## Members and roles
 
@@ -26,21 +30,42 @@ Admins can additionally create **custom roles** (named sets of permission keys) 
 
 Invite people by **email** (they receive a link; if they have no account they sign up first) or by **picking users you already share a workspace with** — no email round-trip needed. Invitations carry a role and optional group membership. Pending invitations can be resent or revoked.
 
-Other ways in:
+An invitation is the only way into a workspace today. There are no join requests: nothing in Kern
+lets a user ask to join a workspace they have found.
 
-- **Join requests** — users can ask to join a workspace they discover; admins approve.
-- **Domain auto-join** — users with a verified email on an allowed domain (`@acme.com`) join automatically with a default role.
+**Domain auto-join is not built.** The General settings page has an *allowed domains* field, and the
+value is stored — but nothing reads it, so nobody joins automatically. Treat the field as inert until
+a release says otherwise.
 
 ## Workspace settings
 
-- **General** — name, slug, branding, locale.
-- **Members, Roles, Groups** — as above.
-- **Modules** — enable/disable modules for this workspace; see [Modules](/administration/modules/).
-- **Integrations** — outbound mail provider. Secrets are encrypted at rest with keys derived from `KERN_SECRET` and are never returned in full by the API.
-- **Webhooks & API** — outgoing webhooks (signed), incoming webhook endpoints, workspace-scoped API tokens.
-- **Audit log** — who changed what in the workspace (members, roles, settings, module toggles).
-- **Import / Export** — importers (Jira, Linear, CSV) and a full workspace export.
-- **Danger zone** — transfer ownership, archive (read-only, hidden from navigation), delete (after a grace period).
+Open `/<slug>/settings`. Each entry appears only for members holding the permission beside it.
+
+| Section | What it holds | Permission |
+|---|---|---|
+| **General** | Name, allowed domains (inert, see above), and the **Archive** action | `core.workspace.manage` |
+| **Members** | Members, their roles, and pending invitations | `core.members.view` |
+| **Roles** | Custom roles and their permission keys | `core.roles.manage` |
+| **Groups** | Named sets of users, and their membership | `core.members.manage` |
+| **Dashboard** | Which widgets the workspace's home page shows | `core.workspace.manage` |
+| **Modules** | Switch modules and their capabilities on and off; see [Modules](/administration/modules/) | `core.modules.manage` |
+| **Integrations** | Per-workspace integration configuration. Secrets are encrypted at rest with keys derived from `KERN_SECRET` and are never returned in full by the API. | `core.integrations.manage` |
+| **MCP & AI access** | Switch MCP on, see connected AI clients, and manage API keys; see [Connect AI clients](/administration/mcp/) | `core.integrations.manage` |
+| **Audit log** | Who changed what in the workspace | `core.audit.view` |
+
+Each enabled module adds its own pages below these — **Email** from Mail, **Plan** from Billing, and
+so on. Your own account settings (Profile, Security, Notifications, Appearance) sit in the same
+place and are not workspace-scoped.
+
+**Archive is the only destructive action in the interface**, and it needs
+`core.workspace.delete`. An archived workspace becomes read-only and drops out of navigation.
+Ownership transfer has no screen and no procedure. Scheduled deletion is on the API only —
+`POST /api/core/workspaces/{workspaceId}/deletion`.
+
+There is no **Webhooks & API** section and no **Import / Export** section. Outgoing webhooks are not
+built at all. Importing is per module — Tracker imports CSV, Jira and Linear exports from its own
+screens, and Quire imports Markdown, HTML, CSV and ZIP from its own. Exporting a whole workspace is
+an API call; see [Backups](/self-hosting/backups/#getting-a-workspace-out).
 
 ## Notifications across workspaces
 

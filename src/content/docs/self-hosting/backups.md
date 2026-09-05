@@ -96,8 +96,41 @@ before the night it matters.
 This is the drill Kern Cloud ran on 2026-09-03: 150 tables, identical counts, every restored table
 owned by the application role so row-level security survived the restore.
 
-## Workspace export
+## Getting a workspace out
 
-Independently of infrastructure backups, workspace admins can export a workspace's data (JSON +
-files) from **Workspace settings → Export**. This is meant for migrations between instances, not
-as a replacement for database backups.
+A workspace export is separate from an infrastructure backup, and it is **on the API only** — no
+screen offers it yet.
+
+Anyone holding `core.export.run` in the workspace can start one:
+
+```bash
+# start an export
+curl -X POST https://kern.example.com/api/core/exports \
+  -H "authorization: Bearer $TOKEN" -H 'content-type: application/json' \
+  -d '{"workspaceId":"<workspace-id>"}'
+
+# poll until status is "ready", then get a download link
+curl "https://kern.example.com/api/core/exports/<id>?workspaceId=<workspace-id>" \
+  -H "authorization: Bearer $TOKEN"
+curl "https://kern.example.com/api/core/exports/<id>/download?workspaceId=<workspace-id>" \
+  -H "authorization: Bearer $TOKEN"
+```
+
+**Result:** a presigned URL for a gzipped JSON archive. It stays downloadable for 72 hours.
+
+Know what it does and does not contain before you rely on it:
+
+- **Core's data.** Members, groups, roles, bindings, invitations, module state, dashboards, search
+  documents and the recent tail of the activity log (50,000 rows).
+- **Files as a manifest, not bytes.** Every file's id, name, size, checksum and storage key, each one
+  downloadable through the normal API. A workspace's attachments can be hundreds of gigabytes, and
+  streaming them into one archive turns a background job into an outage.
+- **No module data.** Core asks each enabled module for its own rows through `<module>.export`, and
+  **no module implements that procedure yet**, so every one of them is listed in the archive's
+  `followUps`. Your issues, pages, messages and assets are not in this file.
+
+So this is a start on data portability, not a migration between instances, and not a substitute for
+the database backup above.
+
+An API key is the easiest way to get `$TOKEN`: **Settings → MCP & AI access** creates one, if an
+admin has switched the core **API keys** capability on.
