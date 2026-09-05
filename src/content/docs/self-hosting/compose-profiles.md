@@ -1,54 +1,98 @@
 ---
 title: Compose profiles
-description: Which containers run by default, and which optional profiles you can enable.
+description: Which containers run by default, which optional profiles exist, and which of them have anything behind them yet.
 ---
 
-The self-host `docker-compose.yml` uses [Compose profiles](https://docs.docker.com/compose/how-tos/profiles/) so the default installation stays small and optional services are opt-in.
+The self-host `docker-compose.yml` uses
+[Compose profiles](https://docs.docker.com/compose/how-tos/profiles/) so the default installation
+stays small and optional services are opt-in.
 
 ## Base (no profile)
 
-Always started: `caddy`, `app`, `core`, `core-worker`, `chat`, `mail`, `collab`, `postgres`, `nats`, `valkey`, `minio` (plus a one-shot `minio-init` that creates the bucket).
+Always started: `caddy`, `app`, `core`, `core-worker`, `chat`, `mail`, `collab`, `postgres`, `nats`,
+`valkey` and `minio`, plus two one-shot containers — `db-init`, which creates the extensions and the
+`kern_app` role, and `minio-init`, which creates the bucket.
 
-This is everything needed for issues, chat, docs & drive, HR, recruiting, CRM, automation, mail and the AI assistant.
-
-## `--profile calls` — LiveKit
-
-Adds `livekit` (`livekit/livekit-server`), configured by `livekit.yaml` and the `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET` variables that `install.sh` generates. Required for audio/video calls, huddles and interview calls.
-
-Open **7881/tcp** and **50000–50200/udp** on your firewall. For clients behind strict NATs you may additionally want a TURN server; `livekit.yaml` is the place to configure it.
-
-```bash
-docker compose --profile calls up -d
-```
+That is everything Kern ships: issues, chat, the wiki, people, outbound mail, the asset register and
+billing. Every module runs inside `core`, `chat` or `mail`; none of them needs a container of its
+own. See [Feature overview](/introduction/feature-overview/).
 
 ## `--profile preview` — Gotenberg
 
-Adds `gotenberg` (`gotenberg/gotenberg:8`), used by Drive to render office documents and other formats to PDF/thumbnails. Image, video and PDF previews work without it.
+Adds `gotenberg` (`gotenberg/gotenberg:8`). **Quire's PDF export** is the one thing that uses it: the
+export job renders a page to HTML and posts it to Gotenberg's Chromium.
+
+Every other Quire export format — Markdown, HTML and ZIP — works without it. So does everything
+else in Kern.
 
 ```bash
 docker compose --profile preview up -d
 ```
 
-## `--profile search` — Meilisearch (*v1.x*)
+**Result:** `docker compose ps` lists `gotenberg` as `running`, and a PDF export in Quire finishes
+instead of failing with "could not reach Gotenberg".
 
-Kern v1.0 searches with Postgres full-text search and trigram indexes, which needs no extra service. A Meilisearch provider is planned for v1.x and will be enabled with this profile.
+Without the profile a PDF export fails cleanly and says which container is missing; nothing else
+degrades. `core` reads `GOTENBERG_URL` and defaults to `http://gotenberg:3000`, which is this
+container — so there is nothing to configure.
 
-## `--profile observability` — GlitchTip + OpenTelemetry (planned)
+## `--profile autoupdate` — the updater
 
-Error tracking and traces for operators who want them. Not required for normal operation.
+Adds `updater` (`docker:27-cli`), which runs `kern-upgrade.sh --auto` hourly. It exists for a host
+with no systemd, and it does nothing at all until an admin switches automatic updates on in
+**Admin → Updates**.
+
+```bash
+docker compose --profile autoupdate up -d
+```
+
+:::caution
+This container mounts the Docker socket, which gives it control of the whole host — a compromise of
+Kern becomes a compromise of everything Docker runs here. Prefer the systemd timer `install.sh`
+offers when the machine has systemd.
+:::
+
+## `--profile calls` — LiveKit
+
+Adds `livekit` (`livekit/livekit-server`), configured by `livekit.yaml` and the `LIVEKIT_API_KEY` /
+`LIVEKIT_API_SECRET` variables.
+
+**Nothing uses it.** No calls module ships, and no code in any Kern service or module places a call,
+mints a room token or renders a call surface — so this profile starts a server no part of the
+product talks to. It is here for the release that ships calls. Leave it off; see
+[Calls](/modules/calls/).
+
+## `--profile search` — Meilisearch (planned)
+
+Kern searches with Postgres full-text search and trigram indexes, which needs no extra service. A
+Meilisearch provider is planned, and this profile is reserved for it. There is no `meilisearch`
+service in the Compose file today.
+
+## `--profile observability` — GlitchTip (planned)
+
+Error tracking and traces for operators who want them. Reserved in the same way; there is no service
+behind it yet.
 
 ## Combining profiles
 
-Profiles are additive and must be repeated on every `docker compose` invocation that should include them (or exported once):
+Profiles are additive and must be repeated on every `docker compose` invocation that should include
+them — or exported once:
 
 ```bash
-export COMPOSE_PROFILES=calls,preview
+export COMPOSE_PROFILES=preview
 docker compose pull && docker compose up -d
 ```
 
+Forget the flag on one command and Compose treats those containers as not part of the project, so
+`docker compose up -d` stops them.
+
 ## Scaling notes
 
-- `core-worker` can be scaled (`docker compose up -d --scale core-worker=2`); jobs are claimed through pg-boss so workers do not collide.
-- `chat` instances fan out through NATS; run more than one behind Caddy when you have thousands of concurrent WebSocket clients.
-- `mail` keeps one IMAP IDLE connection per active inbox account; raise its memory limit if many users connect mailboxes.
-- Postgres, NATS, Valkey and MinIO can all be replaced with external managed services by pointing the corresponding URLs in `.env` at them and removing the bundled containers.
+- `core-worker` can be scaled (`docker compose up -d --scale core-worker=2`); jobs are claimed
+  through pg-boss so workers do not collide.
+- `chat` instances fan out through NATS; run more than one behind Caddy when you have thousands of
+  concurrent WebSocket clients.
+- Postgres, NATS, Valkey and MinIO can all be replaced with external managed services by pointing
+  the corresponding URLs in `.env` at them and removing the bundled containers. For Postgres, read
+  [External Postgres](/self-hosting/external-postgres/) first — the `kern_app` role that `db-init`
+  creates is what makes row-level security apply.
