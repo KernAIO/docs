@@ -21,14 +21,14 @@ description: Commit messages, code style, testing and release conventions across
 
 - **Vitest** everywhere; unit tests next to the code (`*.test.ts`).
 - Integration tests boot a kernel against the dev Postgres (Testcontainers in `core`), stub core procedures through the broker, and assert on events/rows. RLS leak tests and authz matrix tests are required for new tenant tables and permissions.
-- **Playwright** for the app; Lighthouse PWA score ≥ 90; RTL screenshot tests.
+- Every first-party module carries `src/server/migrations.test.ts`, which applies its migration folder to a database created from nothing, applies it a **second** time, and asserts each policy exists once. Copy it into a module of your own: the kernel migrates every hosted module at boot, so a migration that throws on replay stops the whole service, not just your feature.
+- **Playwright** for the app, run in CI. `tests/e2e/ux.spec.ts` is the one that looks at the rendered interface: it sweeps every route in four renderings — light and dark, LTR and RTL — against the rules in `ux-audit.ts`. Adding a route means adding it there.
 
 ## Releases
 
-- `kernel` and `modules` publish `@kernhq/*` with **Changesets** (prereleases on every merge to `main`). Add a changeset to any PR that changes a published package.
-- Services build Docker images on `main` and on `v*` tags; the `kern` repo pins a tested set per release.
-- Renovate keeps dependencies current; review its PRs like any other.
+- `kernel` and each `module-*` repository publish `@kernhq/*` with **Changesets**. Add a changeset to any PR that changes a published package; a breaking change must have one written by hand, because no commit subject can say that an exported type changed shape.
+- Services build Docker images on `main` and on `v*` tags. The nightly workflow in `app` advances every service to the newest compatible set, tags one version across `core`, `shell`, `chat`, `mail` and `collab`, and publishes the release — nothing is tagged or version-bumped by hand. See [Releases and migrations](/developers/releases-and-migrations/).
 
 ## Licensing
 
-The framework (`kernel` repo, plus `_template` and `workflow` in `modules`) is Apache-2.0; the product is AGPL-3.0-only. The file you are editing tells you which applies — see [Licensing](/developers/licensing/). Dependencies must be MIT/Apache/BSD/ISC. Contributions require the [CLA](/contributing/cla/).
+The framework — the `kernel` repository and `module-template` — is Apache-2.0; the product is AGPL-3.0-only. The file you are editing tells you which applies — see [Licensing](/developers/licensing/). Dependencies must be MIT/Apache/BSD/ISC. Contributions require the [CLA](/contributing/cla/).

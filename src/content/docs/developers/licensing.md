@@ -13,8 +13,8 @@ published.
 
 ## Apache-2.0 — the framework
 
-Everything in the [`kernel`](https://github.com/KernAIO/kernel) repository, plus two packages in
-`modules`:
+Everything in the [`kernel`](https://github.com/KernAIO/kernel) repository, plus
+[`module-template`](https://github.com/KernAIO/module-template), which is a repository of its own:
 
 | Package | What it is |
 |---|---|

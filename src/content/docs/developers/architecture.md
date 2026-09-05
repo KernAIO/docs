@@ -7,15 +7,20 @@ Kern is a small set of Node services sharing one Postgres, one event bus and one
 
 ```
                        ┌────────────┐
-   browser/PWA ──────▶ │   Caddy    │ ── /            ─▶ app     (SvelteKit, :3000)
-                       │ (TLS, L7)  │ ── /api/*       ─▶ core    (Fastify + kernel, :4000)  ─┐
-                       │            │ ── /api/chat,/ws─▶ chat    (kernel + WS gateway, :4100)│
-                       │            │ ── /api/mail    ─▶ mail    (kernel + IMAP sync, :4200) │ NATS JetStream
-                       │            │ ── /collab      ─▶ collab  (Hocuspocus/Yjs, :4300)     │ (events, req/reply, KV)
-                       │            │ ── /s3          ─▶ minio                                │
+   browser/PWA ──────▶ │   Caddy    │ ── /             ─▶ app    (SvelteKit, :3000)
+                       │ (TLS, L7)  │ ── /api/*, /mcp  ─▶ core   (Fastify + kernel, :4000)  ─┐
+                       │            │ ── /api/chat,/ws ─▶ chat   (kernel + WS gateway, :4100)│
+                       │            │ ── /api/mail     ─▶ mail   (outbound + webhooks, :4200)│ NATS JetStream
+                       │            │ ── /collab       ─▶ collab (Hocuspocus/Yjs, :4300)     │ (events, req/reply, KV)
+                       │            │ ── /<bucket>/*   ─▶ minio  (presigned, path untouched) │
                        └────────────┘                   core-worker (pg-boss jobs) ──────────┘
-                                              Postgres 18 (per-module schemas, RLS) · Valkey · MinIO · LiveKit(opt)
+                                              Postgres 18 (per-module schemas, RLS) · Valkey · MinIO
 ```
+
+`/mcp` and the OAuth discovery documents sit at core's root rather than under `/api`, because the
+MCP and RFC 8414/9728 specifications fix those paths. The storage route is the bucket name
+(`/kern/*` by default) and nothing may strip it — a presigned URL is a SigV4 signature over the
+canonical path. Both are covered in [Reverse proxy & TLS](/self-hosting/reverse-proxy-tls/).
 
 ## Services
 
@@ -54,7 +59,7 @@ Moving a module from one service to another is configuration: the kernel routes 
 
 ## Data and tenancy
 
-- One Postgres 18 cluster (chat/mail may be pointed at their own databases). **One schema per module**; a module's DB role only sees its own schema, so cross-module data access goes through contracts, never SQL.
+- One Postgres 18 cluster (chat/mail may be pointed at their own databases). **One schema per module** (`mod_<id>`), and cross-module data access goes through contracts, never SQL. The boundary is a convention the review enforces, not a grant: every service connects as the one role `kern_app`, which owns the whole database. Row-level security is what the database itself enforces, and it fences workspaces rather than modules.
 - Every tenant table has `workspace_id` (uuidv7 keys) and **row-level security** keyed on `SET LOCAL app.workspace_id` as defence in depth; composite indexes start with `workspace_id`.
 - Global (non-RLS) tables: users, sessions, workspaces, memberships, notifications, push subscriptions, API keys.
 - Custom fields: metadata tables + JSONB `custom` columns with expression indexes; KQL compiles to SQL over both.
