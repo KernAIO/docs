@@ -67,9 +67,9 @@ Kern serves six services behind one hostname, so it needs exactly one domain.
 `BETTER_AUTH_URL`, the app's origin and the S3 public endpoint from it.
 
 :::note
-Give the **caddy** service the domain, not `app`. Kern's own Caddy is what routes `/api` to core,
-`/api/chat` and `/ws` to chat, `/collab` to collab and `/s3` to MinIO. Pointing the domain at `app`
-reaches the interface and nothing behind it.
+Give the **caddy** service the domain, not `app`. Kern's own Caddy is what routes `/api` and `/mcp`
+to core, `/api/chat` and `/ws` to chat, `/collab` to collab and `/kern/*` to MinIO. Pointing the
+domain at `app` reaches the interface and nothing behind it.
 :::
 
 ## 3. Set the first admin
@@ -138,8 +138,7 @@ Export them from **Environment Variables** and keep them wherever you keep your 
 | Routing | Kern's Caddy | Kern's Caddy, unchanged |
 | Upgrades | `./kern-upgrade.sh` — snapshot, maintenance mode, verify | **Redeploy** in Coolify |
 | Automatic updates | systemd timer or updater container | not available |
-| Office and PDF previews | `--profile preview` | always on — and idle, until previews are built |
-| Calls | `--profile calls`, bundled LiveKit | an external LiveKit |
+| PDF export from Quire | `--profile preview` starts Gotenberg | always on |
 | Postgres init script | mounted | not needed; core's first migration creates the extensions |
 
 ## Upgrading
@@ -182,16 +181,19 @@ Set `SMTP_URL` and `MAIL_FROM` in **Environment Variables** to give the instance
 provider. Workspaces can override it with their own. See the
 [Environment reference](/self-hosting/env-reference/).
 
-## Calls
+## Provider webhooks
 
-The bundled LiveKit needs UDP ports 50000–50200 on the host, which Coolify's proxy cannot front. Run
-LiveKit separately and point Kern at it with three environment variables:
+`MAIL_WEBHOOK_TOKEN` is required for a provider's bounce and complaint webhooks to be accepted at
+all; without it `mail` answers every one `401`. On Coolify it comes from
+`SERVICE_PASSWORD_MAILWEBHOOK`, which Coolify generates for you.
 
-```
-LIVEKIT_URL=wss://livekit.example.com
-LIVEKIT_API_KEY=...
-LIVEKIT_API_SECRET=...
-```
+1. Open **Environment Variables**.
+2. Copy the value of `SERVICE_PASSWORD_MAILWEBHOOK`.
+3. Register `https://<your-domain>/api/mail/webhooks/<provider>?token=<that value>` with your email
+   provider.
+
+**Result:** bounces appear in the workspace's delivery log, and the addresses appear on the
+suppression list. See [Provider webhooks](/self-hosting/env-reference/#provider-webhooks).
 
 ## Problems
 
