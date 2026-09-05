@@ -60,9 +60,42 @@ found.
 | Snapshot | A `pg_dump`, your `.env` and your compose files are copied to `snapshots/<from>-to-<to>-<time>/`. |
 | Maintenance mode | The API answers 503 with `Retry-After` while the database changes, so the interface shows a maintenance screen instead of failed requests. |
 | Migrate | Migrations are applied once, before any new container serves traffic. |
-| Start and verify | `core` comes up first and must report ready. Then everything else starts, and every service must report the new version. |
+| Start and verify | `core` comes up first and must report ready. Then everything else starts, and every service must report the new version. `app` is checked by the image tag it is running. |
+| Stack files | `docker-compose.yml`, `Caddyfile`, `postgres-init/`, `.env.example`, `kern-backup.sh` and `kern-rollback.sh` are brought forward to the new release. |
 
 The last five snapshots are kept. Set `KERN_KEEP_SNAPSHOTS` to keep a different number.
+
+### Stack files, and what happens to yours
+
+Until 2026-09-05 an upgrade changed `KERN_VERSION` and pulled images, and nothing else. An instance
+kept the `docker-compose.yml` and `Caddyfile` it was installed with for ever, so every fix living in
+one of those files reached new installs only.
+
+The upgrade now fetches **both** versions of each file — the one your current release shipped and the
+one the new release ships — and compares them with your copy:
+
+| Your copy matches | What happens |
+|---|---|
+| the new release | nothing to do |
+| your current release | replaced. The old one is kept under `snapshots/stack-<time>/`. |
+| neither | left exactly as it is |
+
+The third row is you having edited the file, or the script being unable to prove you did not. It then
+prints the release's diff, tells you what to merge, and **ends with a warning and exit status 1**
+rather than a green tick. The images moved either way, so that is not a failed upgrade — it is an
+unfinished one, and you are the only person who can finish it.
+
+`kern-upgrade.sh` cannot replace itself while it is running: bash reads a script incrementally, so
+rewriting the file underneath the interpreter runs whatever lands at the byte offset it had reached.
+The new one is saved as `kern-upgrade.sh.new` and the script tells you the `mv` to run. The
+`systemd/` units are not refreshed at all.
+
+To refresh the stack files on their own, with no images, no migrations and no downtime:
+
+```bash
+cd ~/kern
+./kern-upgrade.sh --stack-files
+```
 
 ## Choose how this instance updates
 
@@ -176,8 +209,9 @@ The script asks you to type `restore` before it does this.
 1. Read the release notes for the version you are moving to.
 2. Check whether the release lists new environment variables. The preflight also refuses to run when
    one is missing.
-3. If you customised `Caddyfile` or `docker-compose.yml`, compare them with the new versions in the
-   [`app` repository](https://github.com/KernAIO/app/tree/main/selfhost).
+3. If you have edited `Caddyfile` or `docker-compose.yml`, expect the upgrade to leave them alone and
+   end with a warning. Have the diff it prints merged before you consider the release delivered —
+   see [Stack files, and what happens to yours](#stack-files-and-what-happens-to-yours).
 
 ## Skipping versions
 
