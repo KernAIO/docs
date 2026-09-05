@@ -219,7 +219,16 @@ clientSecret)`, so a half-configured pair leaves that provider off rather than r
 cannot complete a sign-in.
 
 **Result:** after `docker compose up -d`, the sign-in screen draws a button for each provider named
-in `PUBLIC_AUTH_PROVIDERS`, and pressing it completes a sign-in.
+in `PUBLIC_AUTH_PROVIDERS`.
+
+:::caution[Sign in once yourself before you tell your team it works]
+This section arrived in the stack on 2026-09-04. Core registers each provider whose pair is present
+and the buttons are drawn from `PUBLIC_AUTH_PROVIDERS`, but no round trip through a real Google,
+GitHub or Microsoft app has been completed and recorded on a Kern instance. What is between you and
+a working sign-in is the redirect URI: register it exactly as printed above, on the same host as
+`KERN_BASE_URL`, or the provider refuses the callback and Kern never sees the attempt. Passwords,
+magic links and passkeys are unaffected either way.
+:::
 
 ## Billing
 
