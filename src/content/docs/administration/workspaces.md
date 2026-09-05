@@ -33,9 +33,10 @@ Invite people by **email** (they receive a link; if they have no account they si
 An invitation is the only way into a workspace today. There are no join requests: nothing in Kern
 lets a user ask to join a workspace they have found.
 
-**Domain auto-join is not built.** The General settings page has an *allowed domains* field, and the
-value is stored — but nothing reads it, so nobody joins automatically. Treat the field as inert until
-a release says otherwise.
+**Domain auto-join is not built.** `workspaces.autoJoinDomains` is on the API and core stores what
+you write there, but no sign-up path and no subscriber ever reads it, so nobody joins automatically.
+The General settings page offered the field until it was taken out on 2026-09-05: a control that
+saves, reads back and changes nothing teaches an administrator to stop sending invitations.
 
 ## Workspace settings
 
@@ -43,7 +44,7 @@ Open `/<slug>/settings`. Each entry appears only for members holding the permiss
 
 | Section | What it holds | Permission |
 |---|---|---|
-| **General** | Name, allowed domains (inert, see above), and the **Archive** action | `core.workspace.manage` |
+| **General** | Name, slug, description, the role a new member joins with, and **Archive** | `core.workspace.manage` |
 | **Members** | Members, their roles, and pending invitations | `core.members.view` |
 | **Roles** | Custom roles and their permission keys | `core.roles.manage` |
 | **Groups** | Named sets of users, and their membership | `core.members.manage` |
@@ -64,8 +65,9 @@ Ownership transfer has no screen and no procedure. Scheduled deletion is on the 
 
 There is no **Webhooks & API** section and no **Import / Export** section. Outgoing webhooks are not
 built at all. Importing is per module — Tracker imports CSV, Jira and Linear exports from its own
-screens, and Quire imports Markdown, HTML, CSV and ZIP from its own. Exporting a whole workspace is
-an API call; see [Backups](/self-hosting/backups/#getting-a-workspace-out).
+screens, and Quire imports a Notion export, a Confluence export or a folder of Markdown from its
+own. Exporting a whole workspace is an API call; see
+[Backups](/self-hosting/backups/#getting-a-workspace-out).
 
 ## Notifications across workspaces
 
