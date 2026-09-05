@@ -14,8 +14,8 @@ sparingly and require 2FA or a passkey on those accounts.
 The console is a section inside a workspace, not a separate site.
 
 1. Sign in as an instance admin.
-2. Open the account menu.
-3. Select **Instance admin**.
+2. Open the account menu, at your avatar.
+3. Select **Admin**.
 
 **Result:** the browser lands on `/<workspace>/admin/updates`. The entry in the account menu is
 rendered only for instance admins, so nobody without the flag arrives at a locked page.
